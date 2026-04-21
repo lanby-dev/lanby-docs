@@ -10,7 +10,7 @@ The naive solution — punch a hole in your firewall and let Lanby reach in — 
 
 ## How it works
 
-The relay agent runs as a Docker container on any machine inside your network. It maintains a persistent outbound connection to Lanby and polls for its assigned monitors. When a probe is due, the relay executes it locally and reports the result back.
+The relay polls Lanby on a regular interval, receives its current probe configuration, executes due probes locally, and ships results back — all over a single outbound HTTPS connection.
 
 ```mermaid
 sequenceDiagram
@@ -19,42 +19,93 @@ sequenceDiagram
     participant S as Internal service
 
     loop Every poll interval
-        R->>L: POST /sync — poll for due monitors
-        L-->>R: probe config + check states
-        R->>S: execute probe locally
-        R->>L: POST results over HTTPS
+        R->>L: POST /sync (relay version, etag, buffered results)
+        L-->>R: probe config + current monitor states
+        R->>S: execute due probes locally
+        note over R: results buffered in memory
+        R->>L: POST /sync (results flushed on next tick or immediately if a probe fails)
     end
 ```
 
-A periodic heartbeat also lets Lanby report relay health independently of probe results.
+**Adaptive polling:** The relay dynamically adjusts its sync interval to match the shortest probe interval in its assigned set. If your fastest probe runs every 30 seconds, the relay syncs at least that often. When a probe fails, results are flushed immediately rather than waiting for the next tick, so alerts fire as fast as possible.
+
+**Connectivity loss:** If the relay loses connectivity to Lanby, probe results are buffered in memory (up to 500 results) and flushed on the next successful sync. Probes continue running locally during an outage. Results are not persisted to disk — if the relay process restarts during an outage, buffered results are lost, but the probe history resumes from the next successful sync.
+
+## What data leaves your network
+
+This is the complete list of what the relay sends to Lanby. Nothing else crosses the network boundary.
+
+**Sent on every sync:**
+
+| Field | Example | Notes |
+|---|---|---|
+| Relay version | `0.3.1` | The relay binary's version string |
+| Config ETag | `"abc123"` | Used for conditional config fetch — avoids re-sending unchanged config |
+
+**Sent with probe results:**
+
+| Field | Example | Notes |
+|---|---|---|
+| Monitor ID | `mon_01j...` | Opaque ID assigned by Lanby |
+| Timestamp | `2025-11-14T03:21:05Z` | When the probe ran |
+| Status | `ok`, `fail`, `error` | Outcome of the probe |
+| Duration | `142` (ms) | How long the probe took |
+| HTTP status code | `200` | For HTTP probes only |
+| Error message | `connection refused` | Only present on failure |
+
+**Sent on registration/claim:**
+
+| Field | Notes |
+|---|---|
+| Hostname | `os.Hostname()` output — the machine name, not an IP |
+| OS | `linux`, `darwin`, etc. |
+| Architecture | `amd64`, `arm64`, etc. |
+
+**Never sent:**
+
+- Response bodies from probed services
+- Request contents or credentials used in probes
+- Internal IP addresses or network topology
+- Any data from services beyond pass/fail outcomes
+- DNS answers, TLS certificate contents, or any payload data
 
 ## Security model
 
-The relay is designed so that deploying it does not increase your network's attack surface.
-
 **No inbound ports, ever.**
-The relay does not listen on any port and does not run a web server. There is nothing reachable from outside your network — not from Lanby, not from anyone else. Your firewall rules do not change.
+The relay does not listen on any port. There is nothing reachable from outside your network — not from Lanby, not from anyone else. Your firewall rules do not change.
 
 **Outbound HTTPS only.**
-All communication is initiated by the relay over port 443 using TLS. It's the same traffic profile as a browser or a package manager update.
+All communication is initiated by the relay over port 443 to `api.lanby.dev`. No other outbound connections are made. The relay does not phone home for updates, telemetry, or anything else.
 
 **Probe results only, never payload data.**
-The relay sends *outcomes* back to Lanby: pass/fail, latency, status code, and any error message. Response bodies and internal data stay inside your network.
+The relay sends *outcomes* back to Lanby: pass/fail, latency, HTTP status code, and error message text. Response bodies stay inside your network.
 
 **No special privileges required.**
-The relay container runs as an unprivileged process. No `--privileged` flag, no host networking, no kernel capabilities beyond what a normal container has.
+The relay container runs as an unprivileged process. No `--privileged` flag, no host networking. The only exception is ICMP ping probes, which require `NET_RAW` capability (see [ICMP ping](#icmp-ping-and-docker-capabilities)).
 
 **Claim codes are one-time and account-scoped.**
-A relay can only be claimed by someone logged in to your Lanby account who holds the code. The code is single-use and only printed to local logs — it cannot be discovered remotely.
+A relay can only be claimed by someone logged in to your Lanby account who holds the claim code. The code is single-use, expires after a few minutes, and is only printed to local stdout — it cannot be discovered remotely.
 
-!!! info
-    The relay only needs outbound HTTPS (port 443) to reach Lanby, plus access to whichever internal hosts and ports you want it to probe. It does not need internet access for anything else.
+**Identity file.**
+After claiming, the relay saves a credential file (by default at `IDENTITY_PATH`) containing the relay ID and a long-lived secret. This file should be treated like a private key — readable only by the relay process. The volume permissions default to `0600`.
+
+The identity file contains:
+
+```json
+{
+  "relay_id": "rly_01j...",
+  "relay_secret": "...",
+  "claimed_at": "2025-11-14T03:00:00Z",
+  "platform_url": "https://api.lanby.dev",
+  "config_poll_interval_seconds": 30
+}
+```
 
 ## Probe allowlist
 
-By default, the relay probes any target Lanby assigns to it. If you want an extra layer of local control — for example, to prevent the relay from contacting hosts outside your LAN even if your account were compromised — set `ALLOWED_PROBE_HOSTS`.
+By default, the relay probes any target Lanby assigns to it. For an extra layer of local control — so the relay can never reach hosts outside your LAN even if your Lanby account were compromised — set `ALLOWED_PROBE_HOSTS`.
 
-When set, the relay only executes probes whose target matches at least one entry. Targets that don't match are skipped and logged as a warning. The relay refuses to start if any entry is malformed.
+When set, targets that don't match are skipped and logged as a warning. The relay refuses to start if any entry is malformed.
 
 ### Pattern syntax
 
@@ -76,19 +127,17 @@ environment:
 
 ## The claim flow
 
-When a relay starts for the first time it prints a short **claim code** to its logs. Paste that code into the Lanby console to associate the relay with your account. After claiming, the relay is ready to be assigned monitors.
-
-1. Relay starts → generates identity → prints claim code to stdout
-2. Copy the code from `docker logs lanby-relay`
+1. Relay starts → generates identity → requests a claim code from Lanby
+2. Claim code is printed to stdout — copy it from `docker logs lanby-relay`
 3. Go to **console → Relays → Claim**, paste the code, click **Claim relay**
-4. Relay appears in the console → assign monitors → probes start immediately
+4. Relay polls for confirmation, saves identity file, begins receiving monitors
 
 !!! tip
-    The claim code is only printed on **first startup**. If you miss it, delete the identity volume (`lanby-relay-data`) and restart the container to generate a new one. The relay will need to be re-claimed.
+    The claim code expires after a few minutes and is only shown on **first startup**. If you miss it, delete the identity file or volume and restart — the relay will request a new code.
 
 ## Deploying a relay
 
-### 1. Start the container
+### Docker
 
 ```sh
 docker run -d \
@@ -99,7 +148,9 @@ docker run -d \
   ghcr.io/lanby-dev/lanby-relay:latest
 ```
 
-Or with Docker Compose:
+If you use ICMP ping monitors, add `--cap-add NET_RAW`.
+
+### Docker Compose
 
 ```yaml
 services:
@@ -108,53 +159,138 @@ services:
     restart: unless-stopped
     environment:
       IDENTITY_PATH: /data/identity.json
-      # Optional: restrict which hosts this relay may probe
-      # ALLOWED_PROBE_HOSTS: "*.local,192.168.0.0/16"
+      # Restrict which hosts this relay may probe (recommended)
+      ALLOWED_PROBE_HOSTS: "*.local,*.home.arpa,192.168.0.0/16"
     volumes:
       - relay-data:/data
+    # Uncomment if you use ICMP ping monitors:
+    # cap_add:
+    #   - NET_RAW
 
 volumes:
   relay-data:
 ```
 
-### 2. Get the claim code
+### Podman
 
 ```sh
-docker logs lanby-relay 2>&1 | grep "claim code"
-# {"level":"INFO","msg":"relay waiting to be claimed","claim_code":"ABCD-1234", ...}
+podman run -d \
+  --name lanby-relay \
+  --restart unless-stopped \
+  -v lanby-relay-data:/data:Z \
+  -e IDENTITY_PATH=/data/identity.json \
+  ghcr.io/lanby-dev/lanby-relay:latest
 ```
 
-### 3. Claim in the console
+The `:Z` label sets the correct SELinux context for the volume. For rootless Podman, ICMP ping is not available (no `NET_RAW` without root).
 
-Go to [console.lanby.dev/relays](https://console.lanby.dev/relays), paste the claim code, and click **Claim relay**. The relay appears in the table within a few seconds.
+### Bare metal / systemd
 
-### 4. Assign monitors
+Download the binary from the [releases page](https://github.com/lanby-dev/lanby-relay/releases) and install a systemd unit:
 
-When creating or editing a monitor, select your relay from the **Relay** dropdown. The relay begins probing on its next poll cycle.
+```ini
+# /etc/systemd/system/lanby-relay.service
+[Unit]
+Description=Lanby relay agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=lanby-relay
+ExecStart=/usr/local/bin/lanby-relay
+Restart=on-failure
+RestartSec=10
+Environment=IDENTITY_PATH=/var/lib/lanby-relay/identity.json
+Environment=ALLOWED_PROBE_HOSTS=*.local,192.168.0.0/16
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```sh
+useradd -r -s /sbin/nologin lanby-relay
+mkdir -p /var/lib/lanby-relay
+chown lanby-relay: /var/lib/lanby-relay
+systemctl enable --now lanby-relay
+```
+
+### Tailscale and VPN networks
+
+The relay works on Tailscale networks with no special configuration. Run the relay on any Tailscale node and it can probe other nodes by their Tailscale IP (`100.x.x.x`) or MagicDNS hostname (`myhost.tail12345.ts.net`). Use `ALLOWED_PROBE_HOSTS` to restrict probing to your tailnet:
+
+```yaml
+environment:
+  ALLOWED_PROBE_HOSTS: "*.ts.net,100.64.0.0/10"
+```
+
+## Getting the claim code
+
+```sh
+# Docker
+docker logs lanby-relay 2>&1 | grep "claim_code"
+
+# systemd
+journalctl -u lanby-relay | grep "claim_code"
+```
+
+The log line looks like:
+```json
+{"time":"...","level":"INFO","msg":"relay waiting to be claimed","claim_code":"ABCD-1234","expires_at":"..."}
+```
+
+## Assigning monitors
+
+After claiming, go to any monitor in the console and select the relay from the **Relay** dropdown. The relay picks up the new assignment on its next sync (within seconds).
+
+## ICMP ping and Docker capabilities
+
+ICMP ping requires raw socket access. In Docker, add `--cap-add NET_RAW` to the `docker run` command or `cap_add: [NET_RAW]` to your Compose service. Without it, the relay will attempt unprivileged ping (which works on some Linux kernels with `net.ipv4.ping_group_range` set) and skip the probe if that also fails.
+
+In rootless Podman, raw sockets are not available. Use TCP or HTTP probes instead.
+
+## Moving a relay to a new machine
+
+Copy the identity file to the new machine at the same `IDENTITY_PATH`. The relay will authenticate with the saved credentials and resume without re-claiming. No console changes needed.
+
+If you can't copy the identity file, delete it and restart — the relay will generate a new identity and print a new claim code. Claim it in the console and delete the old relay entry.
 
 ## Identity and restarts
 
-The relay generates a **persistent identity file** on first startup and saves it to the mounted volume. On every subsequent start it loads the same identity — so the relay reconnects to your account automatically without needing to be re-claimed.
+The relay saves its identity to `IDENTITY_PATH` on first claim and loads it on every subsequent start. Restarts and container recreations are fully automatic — no intervention needed as long as the volume persists.
 
-If you delete the identity volume or move the relay to a new machine without copying the identity file, it will generate a new identity and you'll need to claim it again. The old relay entry in the console can then be deleted.
+## Logging
 
-## Configuration
+The relay logs structured JSON to stdout. At normal operation only warnings and errors are logged. Probe results and sync activity are logged at `DEBUG` level — enable with:
 
-All configuration is via environment variables.
+```yaml
+environment:
+  LOG_LEVEL: debug
+```
+
+Example log lines:
+
+```json
+{"time":"2025-11-14T03:00:00Z","level":"INFO","msg":"relay claimed successfully","relay_id":"rly_01j..."}
+{"time":"2025-11-14T03:00:05Z","level":"WARN","msg":"probe result","monitor_id":"mon_01j...","target":"http://192.168.1.10:5000","status":"error","duration_ms":5001,"error":"context deadline exceeded"}
+{"time":"2025-11-14T03:00:10Z","level":"WARN","msg":"probe target blocked by ALLOWED_PROBE_HOSTS","monitor_id":"mon_01j...","target":"http://external.example.com/"}
+```
+
+## Configuration reference
+
+All configuration is via environment variables. The relay has no config file.
 
 | Variable | Default | Description |
 |---|---|---|
-| `PLATFORM_URL` | `https://api.lanby.dev` | Lanby API base URL |
-| `IDENTITY_PATH` | `./identity.json` | Path to persist relay identity |
-| `AGENT_VERSION` | *(build-time)* | Version string reported to the platform |
-| `CONFIG_POLL_SECONDS` | `15` | Base poll interval in seconds |
-| `ALLOWED_PROBE_HOSTS` | *(unset — all hosts permitted)* | Comma-separated probe target allowlist |
+| `PLATFORM_URL` | `https://api.lanby.dev` | Lanby API base URL. Override only for self-hosted Lanby deployments. |
+| `IDENTITY_PATH` | `./identity.json` | Path where the relay reads and writes its identity file. Mount a persistent volume here. |
+| `AGENT_VERSION` | *(build-time)* | Version string reported to the platform. Don't override unless you know why. |
+| `CONFIG_POLL_SECONDS` | `15` | Fallback poll interval in seconds. The relay adjusts this dynamically based on assigned probe intervals; this value is used only as a floor and initial default. |
+| `ALLOWED_PROBE_HOSTS` | *(unset — all hosts permitted)* | Comma-separated allowlist of probe targets. See [Probe allowlist](#probe-allowlist). |
 
 ## Requirements
 
-- Docker (any recent version)
-- Outbound HTTPS access to Lanby (port 443)
+- Outbound HTTPS to `api.lanby.dev:443`
 - Network access to the services you want to probe
-- A persistent volume for the identity file
-
-The relay has no inbound port requirements and does not run any web server.
+- A persistent volume or directory for the identity file
+- `NET_RAW` capability only if using ICMP ping monitors

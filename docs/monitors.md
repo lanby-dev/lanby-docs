@@ -9,137 +9,324 @@ flowchart LR
     K(Keepalive monitor)
     S(Your service)
 
-    L -->|probes on schedule| P
-    P -->|checks| S
+    L -->|checks on schedule| P
+    P -->|probes| S
     S -->|pings in| K
     K --> L
 ```
 
-Probes are outbound — Lanby tests your service. Keepalives are inbound — your service tells Lanby it's alive.
+## Monitor states
+
+Every monitor is always in one of these states:
+
+| State | Meaning |
+|---|---|
+| `pending` | Newly created, no results yet. No alerts fire. |
+| `up` | Last check passed. |
+| `degraded` | Check passed but response was slow (above `slow_threshold_ms`), or a TLS certificate is expiring soon. |
+| `down` | Check failed — wrong status, timeout, connection refused, etc. |
+| `paused` | Monitoring suspended. No checks run, no alerts fire. |
+| `unknown` | Monitor exists but no recent data. Occurs after a long offline period. |
+
+**Degraded vs down:** `degraded` means the service is reachable but something is worth flagging — high latency, an expiring certificate, or an unexpected but non-fatal response. `down` means the service failed the check outright. Both states trigger alerts; you can configure separate alert channels for each.
+
+## Retries and recovery
+
+**Retries:** Before marking a monitor down, Lanby retries the failing probe up to the configured retry count. This prevents transient blips from firing spurious alerts. A probe must fail `retries + 1` consecutive times to transition to `down`.
+
+**Recovery:** By default, a single passing check recovers a monitor from `down` back to `up`. Set `recovery_successes` to require multiple consecutive passes before recovery — useful for flappy services.
+
+**Recovery interval:** When a monitor is `down` or `degraded`, the relay switches to `recovery_interval_seconds` instead of the normal interval. Set this lower than the normal interval to detect recovery faster.
+
+---
 
 ## Probe monitors
 
-Probe monitors run on a configured interval and actively test a target. If the target fails to respond as expected — wrong status code, unreachable port, timeout — Lanby marks the monitor as degraded or down and fires an alert.
+Probe monitors run on a configured schedule and actively test a target. If the target fails — wrong status code, unreachable port, timeout — Lanby marks it as down and fires an alert.
 
-Probes can run from the Lanby platform (for publicly reachable services) or be assigned to a [relay agent](relays.md) for services inside a private network.
-
-### HTTP / HTTPS `live`
-
-Sends an HTTP request (GET, HEAD, or POST) to a URL and validates the response. The most common probe type — covers the vast majority of web services, APIs, and dashboards.
-
-- Pass/fail on HTTP status code — any 2xx by default, or a specific list
-- Optional body keyword match — response must contain a given substring
-- TLS certificate expiry checking — alert before the cert expires
-- Custom request headers — for authenticated endpoints
-- Configurable redirect behaviour — follow or treat redirects as failures
-- Timeout, interval, and retry control
-
-*Available from the platform and relay-assignable.*
+Probes run from the Lanby platform (for publicly reachable services) or from a [relay agent](relays.md) for private network services.
 
 ---
 
-### TCP port `live`
+### HTTP / HTTPS
 
-Attempts to open a TCP connection to a host and port. Succeeds if the connection is accepted; fails if the port is closed, filtered, or times out. Works for any TCP service regardless of application protocol.
+Sends an HTTP request to a URL and validates the response. The most common probe type.
 
-- Any host and port combination
-- No application-layer handshake — pure connectivity check
-- Ideal for databases, game servers, custom daemons, IoT devices
+#### Configuration
 
-*Available from the platform and relay-assignable. Relay recommended for private hosts.*
+| Field | Default | Description |
+|---|---|---|
+| `target` | required | Full URL including scheme. e.g. `https://mynas.local:8080/health` |
+| `method` | `GET` | HTTP method: `GET`, `HEAD`, or `POST` |
+| `interval_seconds` | `60` | How often to run the probe |
+| `timeout_seconds` | `10` | Request timeout. Probe fails if no response within this time. |
+| `retries` | `0` | Number of additional attempts before marking down |
+| `recovery_successes` | `1` | Consecutive passes needed to recover from down |
+| `recovery_interval_seconds` | *(same as interval)* | Interval to use while the monitor is down/degraded |
+| `slow_threshold_ms` | *(disabled)* | Mark as `degraded` if response takes longer than this |
+| `expected_status` | *(any 2xx)* | Exact HTTP status code required for success |
+| `success_http_status_codes` | *(empty)* | List of acceptable HTTP status codes. Overrides `expected_status` if set. |
+| `http_body_contains` | *(disabled)* | Response body must contain this substring |
+| `follow_redirects` | `true` | Whether to follow HTTP redirects |
+| `max_redirects` | `5` | Maximum redirects to follow |
+| `headers` | *(empty)* | Map of HTTP headers to include in the request |
+| `ignore_tls_errors` | `false` | Skip TLS certificate verification. Use only for internal services with self-signed certs. |
+| `check_cert_expiry` | `false` | Alert when the TLS certificate is close to expiry |
+| `cert_expiry_min_days` | `14` | Days before expiry to start alerting (requires `check_cert_expiry: true`) |
+
+#### Examples
+
+**Basic health check:**
+```
+Target: https://myapp.local/health
+Method: GET
+Expected status: 200
+Interval: 60s
+Timeout: 10s
+```
+
+**Authenticated API endpoint:**
+```
+Target: https://myapp.local/api/status
+Method: GET
+Headers:
+  Authorization: Bearer mysecrettoken
+  X-Internal: true
+Expected status: 200
+```
+
+**Body keyword match — check the app is actually up, not just returning 200 from a load balancer:**
+```
+Target: https://myapp.local/
+Body contains: "status":"healthy"
+```
+
+**Self-signed certificate (common for internal services):**
+```
+Target: https://192.168.1.50:8443/
+Ignore TLS errors: true
+```
+
+**Certificate expiry monitoring:**
+```
+Target: https://myapp.example.com/
+Check cert expiry: true
+Cert expiry min days: 21
+```
+This marks the monitor as `degraded` 21 days before the cert expires, giving you time to renew before it goes `down`.
+
+**Slow response alerting:**
+```
+Target: https://myapp.local/
+Slow threshold: 2000ms
+```
+Responses over 2 seconds mark the monitor `degraded` even if the status code is correct.
+
+**Specific status codes — useful for endpoints that return 204 or 401:**
+```
+Target: https://myapp.local/api/metrics
+Success status codes: [200, 204]
+```
 
 ---
 
-### ICMP ping `live`
+### TCP port
 
-Sends ICMP echo requests to a host. The simplest possible reachability check — useful for confirming a machine is online when no port is guaranteed to be open.
+Attempts to open a TCP connection to a host and port. Succeeds if the connection is accepted; fails if refused or timed out. No application-layer handshake — pure connectivity.
+
+#### Configuration
+
+| Field | Default | Description |
+|---|---|---|
+| `target` | required | `host:port` — e.g. `192.168.1.10:5432` or `mynas.local:22` |
+| `interval_seconds` | `60` | How often to probe |
+| `timeout_seconds` | `10` | Connection timeout |
+| `retries` | `0` | Retries before marking down |
+| `recovery_successes` | `1` | Passes needed to recover |
+| `recovery_interval_seconds` | *(same as interval)* | Faster interval while down |
+
+#### Examples
+
+```
+# PostgreSQL on a private server
+Target: 192.168.1.10:5432
+
+# SSH availability
+Target: mynas.local:22
+
+# Minecraft server
+Target: mc.home.arpa:25565
+
+# Home Assistant
+Target: homeassistant.local:8123
+```
+
+---
+
+### ICMP ping
+
+Sends ICMP echo requests. The simplest reachability check — useful when no port is guaranteed to be open.
 
 !!! warning
-    Raw ICMP is not available from the Lanby platform — most cloud environments block it. ICMP ping monitors **require a relay** running inside a network that can reach the target.
+    ICMP ping **requires a relay**. The Lanby platform runs in cloud environments that block raw ICMP. Additionally, the relay container needs `NET_RAW` capability — see [relay docs](relays.md#icmp-ping-and-docker-capabilities).
+
+#### Configuration
+
+| Field | Default | Description |
+|---|---|---|
+| `target` | required | Hostname or IP address. e.g. `192.168.1.1` or `router.local` |
+| `timeout_seconds` | `10` | Wait time for ICMP reply |
+| `interval_seconds` | `60` | How often to ping |
+| `retries` | `0` | Retries before marking down |
+
+#### Examples
+
+```
+# Router/gateway reachability
+Target: 192.168.1.1
+
+# Network device with no open ports
+Target: 192.168.1.200
+
+# Another machine by hostname
+Target: myserver.local
+```
 
 ---
 
-### DNS `live`
+### DNS
 
-Resolves a DNS name and optionally checks the answer against an expected substring. Useful for detecting misconfigured records, propagation issues, or unexpected changes to authoritative answers.
+Resolves a DNS name and optionally validates the answer. Useful for detecting broken records, split-horizon mismatches, or unexpected changes.
 
-- Supports A, AAAA, CNAME, TXT, NS record types
-- Optional expected-answer substring match
-- Custom nameserver — query a specific resolver instead of the system default
+#### Configuration
 
-*Available from the platform and relay-assignable.*
+| Field | Default | Description |
+|---|---|---|
+| `target` | required | Used as `dns_host` if `dns_host` is not set |
+| `dns_host` | *(target value)* | The hostname to resolve |
+| `dns_type` | `A` | Record type: `A`, `AAAA`, `CNAME`, `TXT`, `NS` |
+| `dns_expect` | *(disabled)* | Substring that must appear in at least one answer record |
+| `dns_nameserver` | *(system resolver)* | Query a specific nameserver instead. e.g. `192.168.1.1` or `8.8.8.8` |
+| `interval_seconds` | `60` | How often to query |
+| `timeout_seconds` | `5` | Query timeout |
+
+#### Examples
+
+**Check a domain resolves at all:**
+```
+DNS host: myapp.local
+Type: A
+```
+
+**Verify a specific IP is returned (e.g. your internal DNS overrides an external record):**
+```
+DNS host: myapp.example.com
+Type: A
+Expect: 192.168.1.50
+```
+Fails if the answer doesn't contain `192.168.1.50` — useful to catch split-horizon DNS breaking.
+
+**Check your Pi-hole or AdGuard Home is resolving correctly:**
+```
+DNS host: google.com
+Type: A
+Nameserver: 192.168.1.53
+```
+Queries your local resolver directly, bypassing the system default.
+
+**Monitor a Let's Encrypt TXT record or DKIM selector:**
+```
+DNS host: _dmarc.example.com
+Type: TXT
+Expect: v=DMARC1
+```
+
+**Check CNAME is pointing at the right place:**
+```
+DNS host: www.example.com
+Type: CNAME
+Expect: example.com
+```
 
 ---
 
-### gRPC health `live`
+### gRPC health
 
-Calls the standard `grpc.health.v1.Health/Check` RPC and expects a `SERVING` response. Compatible with any service that implements the [gRPC Health Checking Protocol](https://github.com/grpc/grpc/blob/master/doc/health-checking.md) — the same standard used by Kubernetes gRPC liveness probes.
+Calls the standard `grpc.health.v1.Health/Check` RPC and expects a `SERVING` response. Compatible with any service implementing the [gRPC Health Checking Protocol](https://github.com/grpc/grpc/blob/master/doc/health-checking.md).
 
-- Optional service name — check a specific sub-service
-- TLS support including plaintext (insecure) mode
+#### Configuration
 
-*Available from the platform and relay-assignable.*
+| Field | Default | Description |
+|---|---|---|
+| `target` | required | `host:port` — e.g. `myservice.local:50051` |
+| `grpc_service` | *(empty — checks overall server health)* | Sub-service name to check |
+| `grpc_tls` | `false` | Use TLS. Set to `true` for production gRPC services. |
+| `interval_seconds` | `60` | How often to check |
+| `timeout_seconds` | `10` | RPC timeout |
+| `retries` | `0` | Retries before marking down |
+
+#### Examples
+
+**Overall server health:**
+```
+Target: myservice.local:50051
+TLS: false
+```
+
+**Specific sub-service (e.g. a gRPC service with multiple handlers):**
+```
+Target: myservice.local:50051
+Service: myapp.v1.UserService
+TLS: true
+```
 
 ---
 
 ## Keepalive monitors
 
-Keepalive monitors flip the relationship: instead of Lanby probing your service, *your service checks in with Lanby*. If a check-in doesn't arrive within the expected window, Lanby marks the monitor as down and fires an alert.
+Keepalive monitors flip the relationship: your service checks in with Lanby after each run. If check-ins stop arriving, Lanby alerts you.
 
-This is ideal for anything that runs on a schedule — cron jobs, backup scripts, data pipelines, batch processors — where you can't meaningfully probe from the outside, but you can add a single HTTP call at the end of a successful run.
-
-### HTTPS heartbeat `live`
-
-Lanby generates a unique endpoint URL for each keepalive monitor. Your service sends a `POST` to that URL to register a check-in. If a check-in doesn't arrive within the configured interval plus a grace period, the monitor goes down.
-
-- Unique per-monitor heartbeat URL — no credentials needed beyond an API key
-- Configurable interval and grace period
-- Works from any language or environment that can make an HTTP request
-- Code snippets available in the console: curl, bash, cron, Python
-
-[Full setup guide and examples →](keepalive.md)
+[Full keepalive documentation →](keepalive.md)
 
 ---
 
 ## Planned probe types
 
-These are on the roadmap and not yet available in the console.
-
-### Browser / synthetic `planned`
+### Browser / synthetic
 
 Drives a real browser to load a page and optionally interact with it — clicking buttons, filling forms, asserting text. Catches JavaScript errors, broken logins, and issues that HTTP probes miss entirely.
 
 *Requires a relay. Powered by Playwright.*
 
-### SMTP / mail server `planned`
+### SMTP / mail server
 
 Connects to an SMTP server and performs the initial handshake (EHLO). Confirms the mail server is listening and responding — useful for self-hosted mail setups like Mailcow, Maddy, or Postfix.
 
-*Ports 25, 465, 587. STARTTLS support.*
+*Ports 25, 465, 587. STARTTLS support planned.*
 
-### UDP `planned`
+### UDP
 
-Sends a UDP packet and optionally checks for a response. Useful for game servers, VPN endpoints (WireGuard, OpenVPN), DNS over UDP, and other connectionless services.
+Sends a UDP packet and optionally checks for a response. Useful for game servers, VPN endpoints (WireGuard, OpenVPN), and other connectionless services.
 
 *Requires a relay.*
 
-### Push / webhook receiver `planned`
-
-Receives an inbound webhook payload from an external service (Grafana alerts, GitHub Actions, Uptime Kuma, etc.) and converts it into a Lanby notification. Route third-party events through the same destinations you already have configured.
-
-### SNMP `planned`
+### SNMP
 
 Polls an SNMP OID and checks the returned value against a threshold or expected string. Monitor network switches, routers, NAS devices, and UPSes that speak SNMP but don't expose an HTTP API.
 
 *SNMPv1, v2c, v3. Requires a relay.*
 
+### Push / webhook receiver
+
+Receives an inbound webhook payload from an external service (Grafana alerts, GitHub Actions, Uptime Kuma) and converts it into a Lanby notification.
+
 !!! info
-    Have a monitor type you need that isn't listed? Lanby is in early beta — we're building based on what self-hosters actually run. Reach out and let us know.
+    Have a monitor type you need that isn't listed? Reach out — we build based on what self-hosters actually run.
 
 ---
 
 ## About the name
 
-A **LANBY** — *Large Automatic Navigation BuoY* — is a floating navigational aid designed to replace crewed lightships. A LANBY sits offshore, watching over shipping lanes, broadcasting its signal continuously. It's monitored from onshore and built to run for extended periods without human intervention.
+A **LANBY** — *Large Automatic Navigation BuoY* — is a floating navigational aid designed to replace crewed lightships. It sits offshore, watches over shipping lanes, and runs without intervention.
 
-That's exactly what Lanby the product is: infrastructure that watches your services quietly, reliably, from the outside — so you don't have to.
+That's what Lanby the product is: infrastructure that watches your services quietly and reliably, from the outside, so you don't have to.
