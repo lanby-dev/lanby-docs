@@ -14,16 +14,29 @@ The relay polls Lanby on a regular interval, receives its current probe configur
 
 ```mermaid
 sequenceDiagram
-    participant R as Relay (your network)
+    participant R as Relay
     participant L as Lanby
     participant S as Internal service
 
-    loop Every poll interval
-        R->>L: POST /sync (relay version, etag, buffered results)
-        L-->>R: probe config + current monitor states
-        R->>S: execute due probes locally
-        note over R: results buffered in memory
-        R->>L: POST /sync (results flushed on next tick or immediately if a probe fails)
+    rect rgba(80,120,200,0.08)
+        note right of R: Sync tick
+        R->>L: POST /sync (version, etag, buffered results)
+        L-->>R: updated probe config (or 304 if unchanged)
+    end
+
+    rect rgba(120,180,120,0.08)
+        note right of R: Probe execution (between ticks)
+        loop for each probe that is due
+            R->>S: run probe
+            S-->>R: response / timeout / error
+            note over R: result buffered in memory
+        end
+    end
+
+    alt any probe failed
+        R->>L: POST /sync (flush immediately)
+    else all probes passed
+        note over R: results flushed on next sync tick
     end
 ```
 

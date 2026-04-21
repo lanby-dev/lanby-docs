@@ -4,16 +4,13 @@ Lanby supports two broad categories of monitoring: **probes** that actively test
 
 ```mermaid
 flowchart LR
-    L(Lanby)
-    P(Probe monitor)
-    K(Keepalive monitor)
-    S(Your service)
-
-    L -->|checks on schedule| P
-    P -->|probes| S
-    S -->|pings in| K
-    K --> L
+    L[Lanby]
+    S[Your service]
+    L -- "Probe: Lanby checks the service on a schedule" --> S
+    S -- "Keepalive: service checks in after each run" --> L
 ```
+
+Probes fit anything that's always-on and reachable — web apps, databases, game servers, routers. Keepalives fit anything that runs on a schedule — cron jobs, backups, data pipelines.
 
 ## Monitor states
 
