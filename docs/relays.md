@@ -13,24 +13,40 @@ The naive solution — punch a hole in your firewall and let Lanby reach in — 
 The relay polls Lanby on a regular interval, receives its current probe configuration, executes due probes locally, and ships results back — all over a single outbound HTTPS connection.
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {
+  'background': '#1a1a2e',
+  'primaryColor': '#3d4f7a',
+  'primaryBorderColor': '#a8b8ff',
+  'primaryTextColor': '#ffffff',
+  'lineColor': '#ffffff',
+  'signalColor': '#ffffff',
+  'signalTextColor': '#ffffff',
+  'actorBorder': '#a8b8ff',
+  'actorBkg': '#3d4f7a',
+  'actorTextColor': '#ffffff',
+  'actorLineColor': '#a8b8ff',
+  'noteBkgColor': '#4a3d7a',
+  'noteBorderColor': '#c8b8ff',
+  'noteTextColor': '#ffffff',
+  'labelTextColor': '#ffffff',
+  'loopTextColor': '#ffffff',
+  'activationBorderColor': '#a8b8ff',
+  'activationBkgColor': '#3d4f7a'
+}}}%%
 sequenceDiagram
     participant R as Relay
     participant L as Lanby
     participant S as Internal service
 
-    rect rgba(80,120,200,0.08)
-        note right of R: Sync tick
-        R->>L: POST /sync (version, etag, buffered results)
-        L-->>R: updated probe config (or 304 if unchanged)
-    end
+    note right of R: Sync tick
+    R->>L: POST /sync (version, etag, buffered results)
+    L-->>R: updated probe config (or 304 if unchanged)
 
-    rect rgba(120,180,120,0.08)
-        note right of R: Probe execution (between ticks)
-        loop for each probe that is due
-            R->>S: run probe
-            S-->>R: response / timeout / error
-            note over R: result buffered in memory
-        end
+    note right of R: Probe execution (between ticks)
+    loop for each probe that is due
+        R->>S: run probe
+        S-->>R: response / timeout / error
+        note over R: result buffered in memory
     end
 
     alt any probe failed
