@@ -54,16 +54,14 @@ flowchart LR
     classDef dest   fill:#5c3480,stroke:#9d5cce,stroke-width:2px,color:#fff
 
     J["Your cron job\nor script"]:::job
-    L["Lanby API\n(keepalive monitor)"]:::lanby
+    L["Lanby API\nexpects a beat every N\nsilence = alert fires"]:::lanby
     D["Destination\nTelegram · Webhook"]:::dest
 
-    J == "POST /beat/id\nafter each run" ==> L
-    L -. "silence = job\nnever ran" .-> L
-    L -- "alert if\ncheck-in missed" --> D
+    J == "POST /beat/id\nafter each successful run" ==> L
+    L -- "alert" --> D
 
     linkStyle 0 stroke:#e08840,stroke-width:3px
-    linkStyle 1 stroke:#7090ee,stroke-width:2px,stroke-dasharray:6
-    linkStyle 2 stroke:#9d5cce,stroke-width:2px
+    linkStyle 1 stroke:#9d5cce,stroke-width:2px
 ```
 
 ---
