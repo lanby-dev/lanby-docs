@@ -320,10 +320,3 @@ Receives an inbound webhook payload from an external service (Grafana alerts, Gi
 !!! info
     Have a monitor type you need that isn't listed? Reach out — we build based on what self-hosters actually run.
 
----
-
-## About the name
-
-A **LANBY** — *Large Automatic Navigation BuoY* — is a floating navigational aid designed to replace crewed lightships. It sits offshore, watches over shipping lanes, and runs without intervention.
-
-That's what Lanby the product is: infrastructure that watches your services quietly and reliably, from the outside, so you don't have to.

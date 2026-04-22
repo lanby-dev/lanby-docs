@@ -1,5 +1,11 @@
 # Lanby Docs
 
+A **LANBY** — *Large Automatic Navigation BuoY* — is a floating navigational aid designed to replace crewed lightships. It sits offshore, watches over shipping lanes, and runs without intervention.
+
+That's what Lanby the product is: infrastructure that watches your services quietly and reliably, from the outside, so you don't have to.
+
+---
+
 Lanby watches your services from the outside and pings you when something's wrong. It runs on infrastructure that's completely separate from what you're monitoring, so an outage can't take the watchman down with it.
 
 These docs cover the two jobs Lanby does:
@@ -134,3 +140,4 @@ New to Lanby? These pages in order cover 80% of what you'll actually configure:
 
 [**Publish API**](notifications.md)
 : Publish events to Lanby from any script, app, or cron job with a single HTTP call.
+
