@@ -11,36 +11,94 @@ These docs cover the two jobs Lanby does:
 
 ## How the pieces fit
 
+Three patterns cover most setups. Color key used across all diagrams:
+**Blue** = Lanby API &nbsp;·&nbsp; **Teal** = Relay agent &nbsp;·&nbsp; **Orange** = your service or job &nbsp;·&nbsp; **Purple** = alert destination
+
+---
+
+### Managed probe monitor
+
+Lanby probes a publicly reachable service on a schedule. No agent required.
+
 ```mermaid
+%%{init:{'theme':'base','themeVariables':{'primaryColor':'#3a52a8','primaryBorderColor':'#7090ee','primaryTextColor':'#fff','edgeLabelBackground':'#1a1a2e','lineColor':'#7090ee'}}}%%
 flowchart LR
-    subgraph yours["Your stuff"]
-        direction TB
-        s1[Web service]
-        s2[NAS / internal service]
-        s3[Cron / scripts]
-        r[Relay]
-        s2 --- r
-    end
+    classDef lanby  fill:#3a52a8,stroke:#7090ee,stroke-width:2px,color:#fff
+    classDef svc    fill:#a05a20,stroke:#e08840,stroke-width:2px,color:#fff
+    classDef dest   fill:#5c3480,stroke:#9d5cce,stroke-width:2px,color:#fff
 
-    L[Lanby]
+    L["Lanby API\n(probe engine)"]:::lanby
+    S["Your service\nhttps://myapp.com"]:::svc
+    D["Destination\nTelegram · Webhook"]:::dest
 
-    subgraph dests["Destinations"]
-        direction TB
-        d1[Webhook]
-        d2[Telegram]
-    end
+    L == "HTTP · TCP · DNS\nevery N seconds" ==> S
+    S -. "pass / fail + latency" .-> L
+    L -- "alert on\nfailure or recovery" --> D
 
-    L -- probes --> s1
-    r -- probes --> s2
-    s3 -- keepalive / publish --> L
-    L --> d1
-    L --> d2
+    linkStyle 0 stroke:#7090ee,stroke-width:3px,color:#fff
+    linkStyle 1 stroke:#7090ee,stroke-width:2px,stroke-dasharray:6
+    linkStyle 2 stroke:#9d5cce,stroke-width:2px
 ```
 
-- **Probes** hit public services directly from Lanby's cloud.
-- **Relays** extend probes into private networks — no inbound firewall changes, outbound HTTPS only.
-- **Keepalive heartbeats** and the **Publish API** flip the direction: your jobs call Lanby.
-- **Destinations** receive every event — monitor alerts and published notifications alike — routed by topic.
+---
+
+### Keepalive monitor
+
+Your job calls Lanby after each successful run. Lanby alerts if check-ins stop arriving.
+
+```mermaid
+%%{init:{'theme':'base','themeVariables':{'primaryColor':'#3a52a8','primaryBorderColor':'#7090ee','primaryTextColor':'#fff','edgeLabelBackground':'#1a1a2e','lineColor':'#7090ee'}}}%%
+flowchart LR
+    classDef lanby  fill:#3a52a8,stroke:#7090ee,stroke-width:2px,color:#fff
+    classDef job    fill:#a05a20,stroke:#e08840,stroke-width:2px,color:#fff
+    classDef dest   fill:#5c3480,stroke:#9d5cce,stroke-width:2px,color:#fff
+
+    J["Your cron job\nor script"]:::job
+    L["Lanby API\n(keepalive monitor)"]:::lanby
+    D["Destination\nTelegram · Webhook"]:::dest
+
+    J == "POST /beat/id\nafter each run" ==> L
+    L -. "silence = job\nnever ran" .-> L
+    L -- "alert if\ncheck-in missed" --> D
+
+    linkStyle 0 stroke:#e08840,stroke-width:3px
+    linkStyle 1 stroke:#7090ee,stroke-width:2px,stroke-dasharray:6
+    linkStyle 2 stroke:#9d5cce,stroke-width:2px
+```
+
+---
+
+### Relay probe monitor
+
+A relay agent runs inside your private network. It polls Lanby for probe assignments, runs the checks locally, and ships results back — no inbound firewall ports required.
+
+```mermaid
+%%{init:{'theme':'base','themeVariables':{'primaryColor':'#3a52a8','primaryBorderColor':'#7090ee','primaryTextColor':'#fff','edgeLabelBackground':'#1a1a2e','lineColor':'#7090ee'}}}%%
+flowchart LR
+    classDef lanby  fill:#3a52a8,stroke:#7090ee,stroke-width:2px,color:#fff
+    classDef relay  fill:#1e6e5e,stroke:#40c0a8,stroke-width:2px,color:#fff
+    classDef svc    fill:#a05a20,stroke:#e08840,stroke-width:2px,color:#fff
+    classDef dest   fill:#5c3480,stroke:#9d5cce,stroke-width:2px,color:#fff
+
+    subgraph cloud["Lanby cloud"]
+        L["Lanby API"]:::lanby
+        D["Destination\nTelegram · Webhook"]:::dest
+    end
+    subgraph net["Your private network"]
+        R["Relay agent"]:::relay
+        S["Internal service\n192.168.x.x · myhost.local"]:::svc
+    end
+
+    L -- "probe config\n(relay polls)" --> R
+    R == "HTTP · TCP · ICMP\nprobe locally" ==> S
+    R -- "results via\nPOST /sync" --> L
+    L -- "alert on\nfailure or recovery" --> D
+
+    linkStyle 0 stroke:#40c0a8,stroke-width:2px,stroke-dasharray:4
+    linkStyle 1 stroke:#e08840,stroke-width:3px
+    linkStyle 2 stroke:#40c0a8,stroke-width:2px
+    linkStyle 3 stroke:#9d5cce,stroke-width:2px
+```
 
 ---
 
