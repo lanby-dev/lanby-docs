@@ -19,21 +19,25 @@ Every monitor is always in one of these states:
 | State | Meaning |
 |---|---|
 | `pending` | Newly created, no results yet. No alerts fire. |
-| `up` | Last check passed. |
-| `degraded` | Check passed but response was slow (above `slow_threshold_ms`), or a TLS certificate is expiring soon. |
-| `down` | Check failed — wrong status, timeout, connection refused, etc. |
+| `up` | Last check passed within normal latency. |
+| `degraded` | Service is reachable but consistently slow (above `slow_threshold_ms` for `retries_degraded` consecutive checks), or a TLS certificate is expiring soon. |
+| `down` | Check failed `retries + 1` consecutive times — timeout, connection refused, wrong status, etc. |
 | `paused` | Monitoring suspended. No checks run, no alerts fire. |
 | `unknown` | Monitor exists but no recent data. Occurs after a long offline period. |
 
-**Degraded vs down:** `degraded` means the service is reachable but something is worth flagging — high latency, an expiring certificate, or an unexpected but non-fatal response. `down` means the service failed the check outright. Both states trigger alerts; you can configure separate alert channels for each.
+**Degraded vs down:** `degraded` means the service is reachable but impaired — consistently slow responses or an expiring certificate. `down` means the service failed outright for several checks in a row. Both states trigger alerts; you can configure separate channels for each.
+
+A single slow response or a single failure does not trigger a state change on its own — Lanby requires a sustained pattern before alerting. This prevents transient blips from causing noise.
 
 ## Retries and recovery
 
-**Retries:** Before marking a monitor down, Lanby retries the failing probe up to the configured retry count. This prevents transient blips from firing spurious alerts. A probe must fail `retries + 1` consecutive times to transition to `down`.
+**Retries to down (`retries`):** Before marking a monitor `down`, Lanby requires `retries + 1` consecutive hard failures (timeout, connection refused, wrong status). A partial failure streak that clears before reaching that count stays `up` — no alert fires.
 
-**Recovery:** By default, a single passing check recovers a monitor from `down` back to `up`. Set `recovery_successes` to require multiple consecutive passes before recovery — useful for flappy services.
+**Retries to degraded (`retries_degraded`):** Before marking a monitor `degraded` due to slow responses, Lanby requires `retries_degraded` consecutive checks all above `slow_threshold_ms`. A single slow response that is followed by a normal one stays `up`. Default is `2`.
 
-**Recovery interval:** When a monitor is `down` or `degraded`, the relay switches to `recovery_interval_seconds` instead of the normal interval. Set this lower than the normal interval to detect recovery faster.
+**Recovery from down:** After a `down` streak, `recovery_successes` consecutive clean (non-slow) checks are required to return to `up`. A single slow response coming out of `down` transitions to `degraded` rather than `up`. Default is `2`.
+
+**Recovery interval:** When a monitor is `down` or `degraded`, the Relay switches to `recovery_interval_seconds` instead of the normal interval. Set this lower than the normal interval to detect recovery faster.
 
 ---
 
@@ -41,7 +45,31 @@ Every monitor is always in one of these states:
 
 Probe monitors run on a configured schedule and actively test a target. If the target fails — wrong status code, unreachable port, timeout — Lanby marks it as down and fires an alert.
 
-Probes run from the Lanby platform (for publicly reachable services) or from a [relay agent](relays.md) for private network services.
+Probes run from the Lanby platform (for publicly reachable services) or from a [Relay](relays.md) for private network services.
+
+### Monitoring private network services
+
+If the service you want to monitor isn't reachable from the internet — a NAS, a home automation hub, an internal database, anything on a LAN or VPN — use a **Relay**. A Relay runs inside your network, polls Lanby for probe assignments, executes them locally, and ships results back over a single outbound HTTPS connection. Your firewall doesn't change.
+
+**To use a Relay for a monitor:**
+
+1. [Deploy a Relay](relays.md#get-your-relay-running) inside your private network
+2. Create or edit a monitor
+3. Select your Relay from the **Relay** dropdown
+4. Save — the Relay picks up the assignment on its next sync (within seconds)
+
+All probe types work with a Relay. A few require one:
+
+| Probe type | Platform | Relay | Notes |
+|---|---|---|---|
+| HTTP / HTTPS | Yes | Yes | Use a Relay for `*.local`, LAN IPs, or self-signed certs |
+| TCP port | Yes | Yes | — |
+| ICMP ping | **No** | Yes | Platform blocks raw ICMP |
+| DNS | Yes | Yes | Relay useful for querying internal resolvers |
+| gRPC | Yes | Yes | — |
+| Browser / synthetic | **No** | Yes | Playwright not available on the platform |
+| UDP | **No** | Yes | — |
+| SNMP | **No** | Yes | — |
 
 ---
 
@@ -57,8 +85,9 @@ Sends an HTTP request to a URL and validates the response. The most common probe
 | `method` | `GET` | HTTP method: `GET`, `HEAD`, or `POST` |
 | `interval_seconds` | `60` | How often to run the probe |
 | `timeout_seconds` | `10` | Request timeout. Probe fails if no response within this time. |
-| `retries` | `0` | Number of additional attempts before marking down |
-| `recovery_successes` | `1` | Consecutive passes needed to recover from down |
+| `retries` | `0` | Consecutive failures required before marking `down` |
+| `retries_degraded` | `2` | Consecutive slow responses (above `slow_threshold_ms`) required before marking `degraded` |
+| `recovery_successes` | `2` | Consecutive clean passes needed to recover from `down` |
 | `recovery_interval_seconds` | *(same as interval)* | Interval to use while the monitor is down/degraded |
 | `slow_threshold_ms` | *(disabled)* | Mark as `degraded` if response takes longer than this |
 | `expected_status` | *(any 2xx)* | Exact HTTP status code required for success |
@@ -116,8 +145,9 @@ This marks the monitor as `degraded` 21 days before the cert expires, giving you
 ```
 Target: https://myapp.local/
 Slow threshold: 2000ms
+Retries to degraded: 2
 ```
-Responses over 2 seconds mark the monitor `degraded` even if the status code is correct.
+After 2 consecutive responses over 2 seconds the monitor enters `degraded` — even if the status code is correct. A single slow response that clears on the next check stays `up`.
 
 **Specific status codes — useful for endpoints that return 204 or 401:**
 ```
@@ -138,8 +168,9 @@ Attempts to open a TCP connection to a host and port. Succeeds if the connection
 | `target` | required | `host:port` — e.g. `192.168.1.10:5432` or `mynas.local:22` |
 | `interval_seconds` | `60` | How often to probe |
 | `timeout_seconds` | `10` | Connection timeout |
-| `retries` | `0` | Retries before marking down |
-| `recovery_successes` | `1` | Passes needed to recover |
+| `retries` | `0` | Consecutive failures required before marking `down` |
+| `retries_degraded` | `2` | Consecutive slow connections required before marking `degraded` (requires `slow_threshold_ms`) |
+| `recovery_successes` | `2` | Consecutive clean passes needed to recover from `down` |
 | `recovery_interval_seconds` | *(same as interval)* | Faster interval while down |
 
 #### Examples
@@ -165,7 +196,7 @@ Target: homeassistant.local:8123
 Sends ICMP echo requests. The simplest reachability check — useful when no port is guaranteed to be open.
 
 !!! warning
-    ICMP ping **requires a relay**. The Lanby platform runs in cloud environments that block raw ICMP. Additionally, the relay container needs `NET_RAW` capability — see [relay docs](relays.md#icmp-ping-and-docker-capabilities).
+    ICMP ping **requires a Relay**. The Lanby platform runs in cloud environments that block raw ICMP. Additionally, the Relay container needs `NET_RAW` capability — see [Relay docs](relays.md#icmp-ping-and-docker-capabilities).
 
 #### Configuration
 
@@ -174,7 +205,8 @@ Sends ICMP echo requests. The simplest reachability check — useful when no por
 | `target` | required | Hostname or IP address. e.g. `192.168.1.1` or `router.local` |
 | `timeout_seconds` | `10` | Wait time for ICMP reply |
 | `interval_seconds` | `60` | How often to ping |
-| `retries` | `0` | Retries before marking down |
+| `retries` | `0` | Consecutive failures required before marking `down` |
+| `recovery_successes` | `2` | Consecutive passes needed to recover from `down` |
 
 #### Examples
 
@@ -260,7 +292,9 @@ Calls the standard `grpc.health.v1.Health/Check` RPC and expects a `SERVING` res
 | `grpc_tls` | `false` | Use TLS. Set to `true` for production gRPC services. |
 | `interval_seconds` | `60` | How often to check |
 | `timeout_seconds` | `10` | RPC timeout |
-| `retries` | `0` | Retries before marking down |
+| `retries` | `0` | Consecutive failures required before marking `down` |
+| `retries_degraded` | `2` | Consecutive slow RPCs required before marking `degraded` (requires `slow_threshold_ms`) |
+| `recovery_successes` | `2` | Consecutive clean passes needed to recover from `down` |
 
 #### Examples
 
@@ -293,7 +327,7 @@ Keepalive monitors flip the relationship: your service checks in with Lanby afte
 
 Drives a real browser to load a page and optionally interact with it — clicking buttons, filling forms, asserting text. Catches JavaScript errors, broken logins, and issues that HTTP probes miss entirely.
 
-*Requires a relay. Powered by Playwright.*
+*Requires a Relay. Powered by Playwright.*
 
 ### SMTP / mail server
 
@@ -305,13 +339,13 @@ Connects to an SMTP server and performs the initial handshake (EHLO). Confirms t
 
 Sends a UDP packet and optionally checks for a response. Useful for game servers, VPN endpoints (WireGuard, OpenVPN), and other connectionless services.
 
-*Requires a relay.*
+*Requires a Relay.*
 
 ### SNMP
 
 Polls an SNMP OID and checks the returned value against a threshold or expected string. Monitor network switches, routers, NAS devices, and UPSes that speak SNMP but don't expose an HTTP API.
 
-*SNMPv1, v2c, v3. Requires a relay.*
+*SNMPv1, v2c, v3. Requires a Relay.*
 
 ### Push / webhook receiver
 

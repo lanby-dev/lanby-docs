@@ -18,7 +18,7 @@ These docs cover the two jobs Lanby does:
 ## How the pieces fit
 
 Three patterns cover most setups. Color key used across all diagrams:
-**Blue** = Lanby API &nbsp;·&nbsp; **Teal** = Relay agent &nbsp;·&nbsp; **Orange** = your service or job &nbsp;·&nbsp; **Purple** = alert destination
+**Blue** = Lanby API &nbsp;·&nbsp; **Teal** = Relay &nbsp;·&nbsp; **Orange** = your service or job &nbsp;·&nbsp; **Purple** = alert destination
 
 ---
 
@@ -74,7 +74,7 @@ flowchart LR
 
 ### Relay probe monitor
 
-A relay agent runs inside your private network. It polls Lanby for probe assignments, runs the checks locally, and ships results back — no inbound firewall ports required.
+A Relay runs inside your private network. It polls Lanby for probe assignments, runs the checks locally, and ships results back — no inbound firewall ports required.
 
 ```mermaid
 %%{init:{'theme':'base','themeVariables':{'primaryColor':'#3a52a8','primaryBorderColor':'#7090ee','primaryTextColor':'#fff','edgeLabelBackground':'#1a1a2e','lineColor':'#7090ee'}}}%%
@@ -89,7 +89,7 @@ flowchart LR
         D["Destination\nTelegram · Webhook"]:::dest
     end
     subgraph net["Your private network"]
-        R["Relay agent"]:::relay
+        R["Relay"]:::relay
         S["Internal service\n192.168.x.x · myhost.local"]:::svc
     end
 
@@ -112,7 +112,7 @@ New to Lanby? These pages in order cover 80% of what you'll actually configure:
 
 1. [**Monitor types**](monitors.md) — pick the right probe or keepalive for what you're watching.
 2. [**Destinations**](destinations.md) — set up where alerts go.
-3. [**Relay agents**](relays.md) — deploy one if you want to monitor private network services.
+3. [**Relay**](relays.md) — deploy one if you want to monitor private network services.
 4. [**Keepalive heartbeats**](keepalive.md) — wire up cron jobs, backups, and scheduled tasks.
 5. [**Publish API**](notifications.md) — send arbitrary events from any script to your existing destinations.
 
@@ -122,8 +122,8 @@ New to Lanby? These pages in order cover 80% of what you'll actually configure:
 
 ### Concepts
 
-[**Relay agents**](relays.md)
-: How relays work, the security model, deployment, and claiming — for monitoring private network services without opening inbound firewall ports.
+[**Relay**](relays.md)
+: How Relay works, the security model, deployment, and claiming — for monitoring private network services without opening inbound firewall ports.
 
 ### Monitoring
 
