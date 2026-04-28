@@ -1,0 +1,1585 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Guides and reference for Lanby — monitoring, relays, alerts, and the notification API.">
+      
+      
+      
+        <link rel="canonical" href="https://docs.lanby.dev/relays/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../monitors/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Relay agents - Lanby Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#relay" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Lanby Docs" class="md-header__button md-logo" aria-label="Lanby Docs" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Lanby Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Relay agents
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://console.lanby.dev" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Open Console
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Lanby Docs" class="md-nav__button md-logo" aria-label="Lanby Docs" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    Lanby Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://console.lanby.dev" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Open Console
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relay agents
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relay agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-relay-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Relay exists
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-data-leaves-your-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What data leaves your network
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#probe-allowlist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Probe allowlist
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Probe allowlist">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern syntax
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get-your-relay-running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get your Relay running
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Get your Relay running">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-deploy-a-relay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Deploy a Relay
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Deploy a Relay">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docker
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docker Compose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#podman" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Podman
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bare-metal-systemd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bare metal / systemd
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tailscale-and-vpn-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tailscale and VPN networks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-get-the-claim-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Get the claim code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-assign-monitors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Assign monitors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#icmp-ping-and-docker-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ICMP ping and Docker capabilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#moving-a-relay-to-a-new-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Moving a Relay to a new machine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identity-and-restarts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity and restarts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Monitoring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../monitors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../keepalive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keepalive heartbeats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Alerts & Delivery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Alerts & Delivery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../destinations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Destinations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notifications/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Publish API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-relay-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Relay exists
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-data-leaves-your-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What data leaves your network
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#probe-allowlist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Probe allowlist
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Probe allowlist">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern syntax
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get-your-relay-running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get your Relay running
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Get your Relay running">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-deploy-a-relay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Deploy a Relay
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Deploy a Relay">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docker
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docker Compose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#podman" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Podman
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bare-metal-systemd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bare metal / systemd
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tailscale-and-vpn-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tailscale and VPN networks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-get-the-claim-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Get the claim code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-assign-monitors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Assign monitors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#icmp-ping-and-docker-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ICMP ping and Docker capabilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#moving-a-relay-to-a-new-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Moving a Relay to a new machine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identity-and-restarts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity and restarts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="relay">Relay<a class="headerlink" href="#relay" title="Permanent link">&para;</a></h1>
+<p>A Relay is a lightweight agent you run inside your own network. It polls Lanby for assigned monitors and executes probes locally — letting you monitor services that are never exposed to the internet, without opening any inbound firewall ports.</p>
+<pre class="mermaid"><code>%%{init:{'theme':'base','themeVariables':{'primaryColor':'#3a52a8','primaryBorderColor':'#7090ee','primaryTextColor':'#fff','edgeLabelBackground':'#1a1a2e','lineColor':'#7090ee'}}}%%
+flowchart LR
+    classDef lanby  fill:#3a52a8,stroke:#7090ee,stroke-width:2px,color:#fff
+    classDef relay  fill:#1e6e5e,stroke:#40c0a8,stroke-width:2px,color:#fff
+    classDef svc    fill:#a05a20,stroke:#e08840,stroke-width:2px,color:#fff
+    classDef dest   fill:#5c3480,stroke:#9d5cce,stroke-width:2px,color:#fff
+
+    subgraph cloud["Lanby cloud"]
+        L["Lanby API"]:::lanby
+        D["Destination\nTelegram · Webhook"]:::dest
+    end
+    subgraph net["Your private network"]
+        R["Relay"]:::relay
+        S["Internal service\n192.168.x.x · myhost.local"]:::svc
+    end
+
+    L -- "probe config\n(relay polls)" --&gt; R
+    R == "HTTP · TCP · ICMP\nprobe locally" ==&gt; S
+    R -- "results via\nPOST /sync" --&gt; L
+    L -- "alert on\nfailure or recovery" --&gt; D
+
+    linkStyle 0 stroke:#40c0a8,stroke-width:2px,stroke-dasharray:4
+    linkStyle 1 stroke:#e08840,stroke-width:3px
+    linkStyle 2 stroke:#40c0a8,stroke-width:2px
+    linkStyle 3 stroke:#9d5cce,stroke-width:2px</code></pre>
+<div class="admonition tip">
+<p class="admonition-title">Ready to set one up?</p>
+<p><a href="#get-your-relay-running"><strong>Get your Relay running →</strong></a></p>
+</div>
+<hr />
+<h2 id="why-relay-exists">Why Relay exists<a class="headerlink" href="#why-relay-exists" title="Permanent link">&para;</a></h2>
+<p>Lanby's platform-managed probes run from the internet. That works great for public services, but breaks down the moment you want to check anything on a private network — a NAS, a home automation server, an internal database, or a service behind a VPN.</p>
+<p>The naive solution — punch a hole in your firewall and let Lanby reach in — trades monitoring convenience for a permanent inbound exposure. A Relay takes the opposite approach: the agent reaches <em>out</em> to Lanby. Your firewall stays exactly as it is.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The Relay polls Lanby on a regular interval, receives its current probe configuration, executes due probes locally, and ships results back — all over a single outbound HTTPS connection.</p>
+<pre class="mermaid"><code>%%{init:{'theme':'base','themeVariables':{'primaryColor':'#3a52a8','primaryBorderColor':'#7090ee','primaryTextColor':'#fff','edgeLabelBackground':'#1a1a2e','lineColor':'#7090ee'}}}%%
+sequenceDiagram
+    participant R as Relay
+    participant L as Lanby
+    participant S as Internal service
+
+    R-&gt;&gt;L: POST /sync — version, buffered results
+    L--&gt;&gt;R: updated probe config (304 if unchanged)
+
+    loop for each probe that is due
+        R-&gt;&gt;S: probe
+        S--&gt;&gt;R: response / timeout / error
+    end
+
+    alt probe failed
+        R-&gt;&gt;L: POST /sync (flush immediately)
+    end</code></pre>
+<p><strong>Adaptive polling:</strong> The Relay dynamically adjusts its sync interval to match the shortest probe interval in its assigned set. When a probe fails, results are flushed immediately rather than waiting for the next tick, so alerts fire as fast as possible.</p>
+<p><strong>Connectivity loss:</strong> If the Relay loses connectivity to Lanby, probe results are buffered in memory (up to 500 results) and flushed on the next successful sync. Probes continue running locally during an outage. Results are not persisted to disk — if the Relay process restarts during an outage, buffered results are lost, but the probe history resumes from the next successful sync.</p>
+<h2 id="what-data-leaves-your-network">What data leaves your network<a class="headerlink" href="#what-data-leaves-your-network" title="Permanent link">&para;</a></h2>
+<p>This is the complete list of what the Relay sends to Lanby. Nothing else crosses the network boundary.</p>
+<p><strong>Sent on every sync:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Relay version</td>
+<td><code>0.3.1</code></td>
+<td>The Relay binary's version string</td>
+</tr>
+<tr>
+<td>Config ETag</td>
+<td><code>"abc123"</code></td>
+<td>Used for conditional config fetch — avoids re-sending unchanged config</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Sent with probe results:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Monitor ID</td>
+<td><code>mon_01j...</code></td>
+<td>Opaque ID assigned by Lanby</td>
+</tr>
+<tr>
+<td>Timestamp</td>
+<td><code>2025-11-14T03:21:05Z</code></td>
+<td>When the probe ran</td>
+</tr>
+<tr>
+<td>Status</td>
+<td><code>ok</code>, <code>fail</code>, <code>error</code></td>
+<td>Outcome of the probe</td>
+</tr>
+<tr>
+<td>Duration</td>
+<td><code>142</code> (ms)</td>
+<td>How long the probe took</td>
+</tr>
+<tr>
+<td>HTTP status code</td>
+<td><code>200</code></td>
+<td>For HTTP probes only</td>
+</tr>
+<tr>
+<td>Error message</td>
+<td><code>connection refused</code></td>
+<td>Only present on failure</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Sent on registration/claim:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hostname</td>
+<td><code>os.Hostname()</code> output — the machine name, not an IP</td>
+</tr>
+<tr>
+<td>OS</td>
+<td><code>linux</code>, <code>darwin</code>, etc.</td>
+</tr>
+<tr>
+<td>Architecture</td>
+<td><code>amd64</code>, <code>arm64</code>, etc.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Never sent:</strong></p>
+<ul>
+<li>Response bodies from probed services</li>
+<li>Request contents or credentials used in probes</li>
+<li>Internal IP addresses or network topology</li>
+<li>Any data from services beyond pass/fail outcomes</li>
+<li>DNS answers, TLS certificate contents, or any payload data</li>
+</ul>
+<h2 id="security-model">Security model<a class="headerlink" href="#security-model" title="Permanent link">&para;</a></h2>
+<p><strong>No inbound ports, ever.</strong>
+The Relay does not listen on any port. There is nothing reachable from outside your network — not from Lanby, not from anyone else. Your firewall rules do not change.</p>
+<p><strong>Outbound HTTPS only.</strong>
+All communication is initiated by the Relay over port 443 to <code>api.lanby.dev</code>. No other outbound connections are made. The Relay does not phone home for updates, telemetry, or anything else.</p>
+<p><strong>Probe results only, never payload data.</strong>
+The Relay sends <em>outcomes</em> back to Lanby: pass/fail, latency, HTTP status code, and error message text. Response bodies stay inside your network.</p>
+<p><strong>No special privileges required.</strong>
+The Relay container runs as an unprivileged process. No <code>--privileged</code> flag, no host networking. The only exception is ICMP ping probes, which require <code>NET_RAW</code> capability (see <a href="#icmp-ping-and-docker-capabilities">ICMP ping</a>).</p>
+<p><strong>Claim codes are one-time and account-scoped.</strong>
+A Relay can only be claimed by someone logged in to your Lanby account who holds the claim code. The code is single-use, expires after a few minutes, and is only printed to local stdout — it cannot be discovered remotely.</p>
+<p><strong>Identity file.</strong>
+After claiming, the Relay saves a credential file (by default at <code>IDENTITY_PATH</code>) containing the Relay ID and a long-lived secret. This file should be treated like a private key — readable only by the Relay process. The volume permissions default to <code>0600</code>.</p>
+<p>The identity file contains:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;relay_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rly_01j...&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;relay_secret&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;claimed_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-11-14T03:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">&quot;platform_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://api.lanby.dev&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">&quot;config_poll_interval_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+</code></pre></div>
+<h2 id="probe-allowlist">Probe allowlist<a class="headerlink" href="#probe-allowlist" title="Permanent link">&para;</a></h2>
+<p>By default, the Relay probes any target Lanby assigns to it. For an extra layer of local control — so the Relay can never reach hosts outside your LAN even if your Lanby account were compromised — set <code>ALLOWED_PROBE_HOSTS</code>.</p>
+<p>When set, targets that don't match are skipped and logged as a warning. The Relay refuses to start if any entry is malformed.</p>
+<h3 id="pattern-syntax">Pattern syntax<a class="headerlink" href="#pattern-syntax" title="Permanent link">&para;</a></h3>
+<p>The value is a comma-separated list. Three forms are supported:</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Example</th>
+<th>Matches</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Exact hostname or IP</td>
+<td><code>mynas.local</code></td>
+<td><code>mynas.local</code> only</td>
+</tr>
+<tr>
+<td>Wildcard subdomain</td>
+<td><code>*.home.arpa</code></td>
+<td><code>foo.home.arpa</code>, not <code>home.arpa</code> itself</td>
+</tr>
+<tr>
+<td>CIDR block</td>
+<td><code>192.168.0.0/16</code></td>
+<td>IP-literal targets in that range</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">environment</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">ALLOWED_PROBE_HOSTS</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;*.local,*.home.arpa,192.168.0.0/16,10.0.0.0/8&quot;</span>
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>CIDRs match only IP-literal targets. For hostname-based targets like <code>mynas.local</code>, use a hostname pattern (<code>mynas.local</code> or <code>*.local</code>) — the Relay checks the raw target string, not its resolved IP.</p>
+</div>
+<hr />
+<h2 id="get-your-relay-running">Get your Relay running<a class="headerlink" href="#get-your-relay-running" title="Permanent link">&para;</a></h2>
+<h3 id="1-deploy-a-relay">1. Deploy a Relay<a class="headerlink" href="#1-deploy-a-relay" title="Permanent link">&para;</a></h3>
+<h4 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>--name<span class="w"> </span>lanby-relay<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>--restart<span class="w"> </span>unless-stopped<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span>-v<span class="w"> </span>lanby-relay-data:/data<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">IDENTITY_PATH</span><span class="o">=</span>/data/identity.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span>ghcr.io/lanby-dev/lanby-relay:latest
+</code></pre></div>
+<p>If you use ICMP ping monitors, add <code>--cap-add NET_RAW</code>.</p>
+<h4 id="docker-compose">Docker Compose<a class="headerlink" href="#docker-compose" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">services</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">lanby-relay</span><span class="p">:</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/lanby-dev/lanby-relay:latest</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">      </span><span class="nt">IDENTITY_PATH</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data/identity.json</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">      </span><span class="c1"># Restrict which hosts this relay may probe for added security (optional)</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">      </span><span class="c1"># ALLOWED_PROBE_HOSTS: &quot;*.local,*.home.arpa,192.168.0.0/16&quot;</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">relay-data:/data</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="c1"># Uncomment if you use ICMP ping monitors:</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="c1"># cap_add:</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="c1">#   - NET_RAW</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="nt">volumes</span><span class="p">:</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">  </span><span class="nt">relay-data</span><span class="p">:</span>
+</code></pre></div>
+<h4 id="podman">Podman<a class="headerlink" href="#podman" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>podman<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>--name<span class="w"> </span>lanby-relay<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>--restart<span class="w"> </span>unless-stopped<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>-v<span class="w"> </span>lanby-relay-data:/data:Z<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">IDENTITY_PATH</span><span class="o">=</span>/data/identity.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span>ghcr.io/lanby-dev/lanby-relay:latest
+</code></pre></div>
+<p>The <code>:Z</code> label sets the correct SELinux context for the volume. For rootless Podman, ICMP ping is not available (no <code>NET_RAW</code> without root).</p>
+<h4 id="bare-metal-systemd">Bare metal / systemd<a class="headerlink" href="#bare-metal-systemd" title="Permanent link">&para;</a></h4>
+<p>Download the binary from the <a href="https://github.com/lanby-dev/lanby-relay/releases">releases page</a> and install a systemd unit:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># /etc/systemd/system/lanby-relay.service</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">[Unit]</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="na">Description</span><span class="o">=</span><span class="s">Lanby relay agent</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="na">After</span><span class="o">=</span><span class="s">network-online.target</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="na">Wants</span><span class="o">=</span><span class="s">network-online.target</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="k">[Service]</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="na">Type</span><span class="o">=</span><span class="s">simple</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="na">User</span><span class="o">=</span><span class="s">lanby-relay</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="na">ExecStart</span><span class="o">=</span><span class="s">/usr/local/bin/lanby-relay</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="na">Restart</span><span class="o">=</span><span class="s">on-failure</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="na">RestartSec</span><span class="o">=</span><span class="s">10</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="na">Environment</span><span class="o">=</span><span class="s">IDENTITY_PATH=/var/lib/lanby-relay/identity.json</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="na">Environment</span><span class="o">=</span><span class="s">ALLOWED_PROBE_HOSTS=*.local,192.168.0.0/16</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="k">[Install]</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>useradd<span class="w"> </span>-r<span class="w"> </span>-s<span class="w"> </span>/sbin/nologin<span class="w"> </span>lanby-relay
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>/var/lib/lanby-relay
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>chown<span class="w"> </span>lanby-relay:<span class="w"> </span>/var/lib/lanby-relay
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>lanby-relay
+</code></pre></div>
+<h4 id="tailscale-and-vpn-networks">Tailscale and VPN networks<a class="headerlink" href="#tailscale-and-vpn-networks" title="Permanent link">&para;</a></h4>
+<p>The Relay works on Tailscale networks with no special configuration. Run the Relay on any Tailscale node and it can probe other nodes by their Tailscale IP (<code>100.x.x.x</code>) or MagicDNS hostname (<code>myhost.tail12345.ts.net</code>). Use <code>ALLOWED_PROBE_HOSTS</code> to restrict probing to your tailnet:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">environment</span><span class="p">:</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">ALLOWED_PROBE_HOSTS</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;*.ts.net,100.64.0.0/10&quot;</span>
+</code></pre></div>
+<h3 id="2-get-the-claim-code">2. Get the claim code<a class="headerlink" href="#2-get-the-claim-code" title="Permanent link">&para;</a></h3>
+<p>On first startup the Relay prints a claim code to stdout. Fetch it with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Docker</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>docker<span class="w"> </span>logs<span class="w"> </span>lanby-relay<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;claim_code&quot;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># systemd</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>journalctl<span class="w"> </span>-u<span class="w"> </span>lanby-relay<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;claim_code&quot;</span>
+</code></pre></div>
+<p>The log line looks like:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span><span class="nt">&quot;time&quot;</span><span class="p">:</span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="s2">&quot;relay waiting to be claimed&quot;</span><span class="p">,</span><span class="nt">&quot;claim_code&quot;</span><span class="p">:</span><span class="s2">&quot;ABCD-1234&quot;</span><span class="p">,</span><span class="nt">&quot;expires_at&quot;</span><span class="p">:</span><span class="s2">&quot;...&quot;</span><span class="p">}</span>
+</code></pre></div></p>
+<p>Then go to <strong>console → Relays → Claim</strong>, paste the code, and click <strong>Claim relay</strong>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The claim code expires after a few minutes and is only shown on <strong>first startup</strong>. If you miss it, delete the identity file or volume and restart — the Relay will request a new code.</p>
+</div>
+<h3 id="3-assign-monitors">3. Assign monitors<a class="headerlink" href="#3-assign-monitors" title="Permanent link">&para;</a></h3>
+<p>After claiming, go to any monitor in the console and select the Relay from the <strong>Relay</strong> dropdown. The Relay picks up the new assignment on its next sync (within seconds).</p>
+<hr />
+<h2 id="icmp-ping-and-docker-capabilities">ICMP ping and Docker capabilities<a class="headerlink" href="#icmp-ping-and-docker-capabilities" title="Permanent link">&para;</a></h2>
+<p>ICMP ping requires raw socket access. In Docker, add <code>--cap-add NET_RAW</code> to the <code>docker run</code> command or <code>cap_add: [NET_RAW]</code> to your Compose service. Without it, the Relay will attempt unprivileged ping (which works on some Linux kernels with <code>net.ipv4.ping_group_range</code> set) and skip the probe if that also fails.</p>
+<p>In rootless Podman, raw sockets are not available. Use TCP or HTTP probes instead.</p>
+<h2 id="moving-a-relay-to-a-new-machine">Moving a Relay to a new machine<a class="headerlink" href="#moving-a-relay-to-a-new-machine" title="Permanent link">&para;</a></h2>
+<p>Copy the identity file to the new machine at the same <code>IDENTITY_PATH</code>. The Relay will authenticate with the saved credentials and resume without re-claiming. No console changes needed.</p>
+<p>If you can't copy the identity file, delete it and restart — the Relay will generate a new identity and print a new claim code. Claim it in the console and delete the old Relay entry.</p>
+<h2 id="identity-and-restarts">Identity and restarts<a class="headerlink" href="#identity-and-restarts" title="Permanent link">&para;</a></h2>
+<p>The Relay saves its identity to <code>IDENTITY_PATH</code> on first claim and loads it on every subsequent start. Restarts and container recreations are fully automatic — no intervention needed as long as the volume persists.</p>
+<h2 id="logging">Logging<a class="headerlink" href="#logging" title="Permanent link">&para;</a></h2>
+<p>The Relay logs structured JSON to stdout. At normal operation only warnings and errors are logged. Probe results and sync activity are logged at <code>DEBUG</code> level — enable with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">environment</span><span class="p">:</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">LOG_LEVEL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">debug</span>
+</code></pre></div>
+<p>Example log lines:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span><span class="nt">&quot;time&quot;</span><span class="p">:</span><span class="s2">&quot;2025-11-14T03:00:00Z&quot;</span><span class="p">,</span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="s2">&quot;relay claimed successfully&quot;</span><span class="p">,</span><span class="nt">&quot;relay_id&quot;</span><span class="p">:</span><span class="s2">&quot;rly_01j...&quot;</span><span class="p">}</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="p">{</span><span class="nt">&quot;time&quot;</span><span class="p">:</span><span class="s2">&quot;2025-11-14T03:00:05Z&quot;</span><span class="p">,</span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="s2">&quot;WARN&quot;</span><span class="p">,</span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="s2">&quot;probe result&quot;</span><span class="p">,</span><span class="nt">&quot;monitor_id&quot;</span><span class="p">:</span><span class="s2">&quot;mon_01j...&quot;</span><span class="p">,</span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="s2">&quot;http://192.168.1.10:5000&quot;</span><span class="p">,</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;error&quot;</span><span class="p">,</span><span class="nt">&quot;duration_ms&quot;</span><span class="p">:</span><span class="mi">5001</span><span class="p">,</span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="s2">&quot;context deadline exceeded&quot;</span><span class="p">}</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">{</span><span class="nt">&quot;time&quot;</span><span class="p">:</span><span class="s2">&quot;2025-11-14T03:00:10Z&quot;</span><span class="p">,</span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="s2">&quot;WARN&quot;</span><span class="p">,</span><span class="nt">&quot;msg&quot;</span><span class="p">:</span><span class="s2">&quot;probe target blocked by ALLOWED_PROBE_HOSTS&quot;</span><span class="p">,</span><span class="nt">&quot;monitor_id&quot;</span><span class="p">:</span><span class="s2">&quot;mon_01j...&quot;</span><span class="p">,</span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="s2">&quot;http://external.example.com/&quot;</span><span class="p">}</span>
+</code></pre></div>
+<h2 id="configuration-reference">Configuration reference<a class="headerlink" href="#configuration-reference" title="Permanent link">&para;</a></h2>
+<p>All configuration is via environment variables. The Relay has no config file.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PLATFORM_URL</code></td>
+<td><code>https://api.lanby.dev</code></td>
+<td>Lanby API base URL. Override only for self-hosted Lanby deployments.</td>
+</tr>
+<tr>
+<td><code>IDENTITY_PATH</code></td>
+<td><code>./identity.json</code></td>
+<td>Path where the Relay reads and writes its identity file. Mount a persistent volume here.</td>
+</tr>
+<tr>
+<td><code>AGENT_VERSION</code></td>
+<td><em>(build-time)</em></td>
+<td>Version string reported to the platform. Don't override unless you know why.</td>
+</tr>
+<tr>
+<td><code>CONFIG_POLL_SECONDS</code></td>
+<td><code>15</code></td>
+<td>Fallback poll interval in seconds. The Relay adjusts this dynamically based on assigned probe intervals; this value is used only as a floor and initial default.</td>
+</tr>
+<tr>
+<td><code>ALLOWED_PROBE_HOSTS</code></td>
+<td><em>(unset — all hosts permitted)</em></td>
+<td>Comma-separated allowlist of probe targets. See <a href="#probe-allowlist">Probe allowlist</a>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Outbound HTTPS to <code>api.lanby.dev:443</code></li>
+<li>Network access to the services you want to probe</li>
+<li>A persistent volume or directory for the identity file</li>
+<li><code>NET_RAW</code> capability only if using ICMP ping monitors</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

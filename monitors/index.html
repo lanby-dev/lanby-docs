@@ -1,0 +1,1932 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Guides and reference for Lanby — monitoring, relays, alerts, and the notification API.">
+      
+      
+      
+        <link rel="canonical" href="https://docs.lanby.dev/monitors/">
+      
+      
+        <link rel="prev" href="../relays/">
+      
+      
+        <link rel="next" href="../keepalive/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Monitor types - Lanby Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#monitor-types" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Lanby Docs" class="md-header__button md-logo" aria-label="Lanby Docs" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Lanby Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Monitor types
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://console.lanby.dev" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Open Console
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Lanby Docs" class="md-nav__button md-logo" aria-label="Lanby Docs" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    Lanby Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://console.lanby.dev" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Open Console
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../relays/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relay agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Monitoring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitor types
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#monitor-states" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitor states
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#retries-and-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retries and recovery
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#probe-monitors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Probe monitors
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Probe monitors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-private-network-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring private network services
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-https" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP / HTTPS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="HTTP / HTTPS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcp-port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TCP port
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TCP port">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#icmp-ping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ICMP ping
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ICMP ping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DNS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gRPC health
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="gRPC health">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keepalive-monitors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keepalive monitors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#planned-probe-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Planned probe types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Planned probe types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#browser-synthetic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Browser / synthetic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#smtp-mail-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SMTP / mail server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#udp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UDP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#snmp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SNMP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#push-webhook-receiver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Push / webhook receiver
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../keepalive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keepalive heartbeats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Alerts & Delivery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Alerts & Delivery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../destinations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Destinations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notifications/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Publish API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#monitor-states" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitor states
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#retries-and-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retries and recovery
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#probe-monitors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Probe monitors
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Probe monitors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-private-network-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring private network services
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-https" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP / HTTPS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="HTTP / HTTPS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tcp-port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TCP port
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TCP port">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#icmp-ping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ICMP ping
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ICMP ping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DNS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gRPC health
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="gRPC health">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keepalive-monitors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keepalive monitors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#planned-probe-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Planned probe types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Planned probe types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#browser-synthetic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Browser / synthetic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#smtp-mail-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SMTP / mail server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#udp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UDP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#snmp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SNMP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#push-webhook-receiver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Push / webhook receiver
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="monitor-types">Monitor types<a class="headerlink" href="#monitor-types" title="Permanent link">&para;</a></h1>
+<p>Lanby supports two broad categories of monitoring: <strong>probes</strong> that actively test a service on a schedule, and <strong>keepalive heartbeats</strong> that expect your service to check in periodically.</p>
+<pre class="mermaid"><code>flowchart LR
+    L[Lanby]
+    S[Your service]
+    L -- "Probe: Lanby checks the service on a schedule" --&gt; S
+    S -- "Keepalive: service checks in after each run" --&gt; L</code></pre>
+<p>Probes fit anything that's always-on and reachable — web apps, databases, game servers, routers. Keepalives fit anything that runs on a schedule — cron jobs, backups, data pipelines.</p>
+<h2 id="monitor-states">Monitor states<a class="headerlink" href="#monitor-states" title="Permanent link">&para;</a></h2>
+<p>Every monitor is always in one of these states:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pending</code></td>
+<td>Newly created, no results yet. No alerts fire.</td>
+</tr>
+<tr>
+<td><code>up</code></td>
+<td>Last check passed within normal latency.</td>
+</tr>
+<tr>
+<td><code>degraded</code></td>
+<td>Service is reachable but consistently slow (above <code>slow_threshold_ms</code> for <code>retries_degraded</code> consecutive checks), or a TLS certificate is expiring soon.</td>
+</tr>
+<tr>
+<td><code>down</code></td>
+<td>Check failed <code>retries + 1</code> consecutive times — timeout, connection refused, wrong status, etc.</td>
+</tr>
+<tr>
+<td><code>paused</code></td>
+<td>Monitoring suspended. No checks run, no alerts fire.</td>
+</tr>
+<tr>
+<td><code>unknown</code></td>
+<td>Monitor exists but no recent data. Occurs after a long offline period.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Degraded vs down:</strong> <code>degraded</code> means the service is reachable but impaired — consistently slow responses or an expiring certificate. <code>down</code> means the service failed outright for several checks in a row. Both states trigger alerts; you can configure separate channels for each.</p>
+<p>A single slow response or a single failure does not trigger a state change on its own — Lanby requires a sustained pattern before alerting. This prevents transient blips from causing noise.</p>
+<h2 id="retries-and-recovery">Retries and recovery<a class="headerlink" href="#retries-and-recovery" title="Permanent link">&para;</a></h2>
+<p><strong>Retries to down (<code>retries</code>):</strong> Before marking a monitor <code>down</code>, Lanby requires <code>retries + 1</code> consecutive hard failures (timeout, connection refused, wrong status). A partial failure streak that clears before reaching that count stays <code>up</code> — no alert fires.</p>
+<p><strong>Retries to degraded (<code>retries_degraded</code>):</strong> Before marking a monitor <code>degraded</code> due to slow responses, Lanby requires <code>retries_degraded</code> consecutive checks all above <code>slow_threshold_ms</code>. A single slow response that is followed by a normal one stays <code>up</code>. Default is <code>2</code>.</p>
+<p><strong>Recovery from down:</strong> After a <code>down</code> streak, <code>recovery_successes</code> consecutive clean (non-slow) checks are required to return to <code>up</code>. A single slow response coming out of <code>down</code> transitions to <code>degraded</code> rather than <code>up</code>. Default is <code>2</code>.</p>
+<p><strong>Recovery interval:</strong> When a monitor is <code>down</code> or <code>degraded</code>, the Relay switches to <code>recovery_interval_seconds</code> instead of the normal interval. Set this lower than the normal interval to detect recovery faster.</p>
+<hr />
+<h2 id="probe-monitors">Probe monitors<a class="headerlink" href="#probe-monitors" title="Permanent link">&para;</a></h2>
+<p>Probe monitors run on a configured schedule and actively test a target. If the target fails — wrong status code, unreachable port, timeout — Lanby marks it as down and fires an alert.</p>
+<p>Probes run from the Lanby platform (for publicly reachable services) or from a <a href="../relays/">Relay</a> for private network services.</p>
+<h3 id="monitoring-private-network-services">Monitoring private network services<a class="headerlink" href="#monitoring-private-network-services" title="Permanent link">&para;</a></h3>
+<p>If the service you want to monitor isn't reachable from the internet — a NAS, a home automation hub, an internal database, anything on a LAN or VPN — use a <strong>Relay</strong>. A Relay runs inside your network, polls Lanby for probe assignments, executes them locally, and ships results back over a single outbound HTTPS connection. Your firewall doesn't change.</p>
+<p><strong>To use a Relay for a monitor:</strong></p>
+<ol>
+<li><a href="../relays/#get-your-relay-running">Deploy a Relay</a> inside your private network</li>
+<li>Create or edit a monitor</li>
+<li>Select your Relay from the <strong>Relay</strong> dropdown</li>
+<li>Save — the Relay picks up the assignment on its next sync (within seconds)</li>
+</ol>
+<p>All probe types work with a Relay. A few require one:</p>
+<table>
+<thead>
+<tr>
+<th>Probe type</th>
+<th>Platform</th>
+<th>Relay</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP / HTTPS</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Use a Relay for <code>*.local</code>, LAN IPs, or self-signed certs</td>
+</tr>
+<tr>
+<td>TCP port</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td>ICMP ping</td>
+<td><strong>No</strong></td>
+<td>Yes</td>
+<td>Platform blocks raw ICMP</td>
+</tr>
+<tr>
+<td>DNS</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Relay useful for querying internal resolvers</td>
+</tr>
+<tr>
+<td>gRPC</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Browser / synthetic</td>
+<td><strong>No</strong></td>
+<td>Yes</td>
+<td>Playwright not available on the platform</td>
+</tr>
+<tr>
+<td>UDP</td>
+<td><strong>No</strong></td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td>SNMP</td>
+<td><strong>No</strong></td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="http-https">HTTP / HTTPS<a class="headerlink" href="#http-https" title="Permanent link">&para;</a></h3>
+<p>Sends an HTTP request to a URL and validates the response. The most common probe type.</p>
+<h4 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target</code></td>
+<td>required</td>
+<td>Full URL including scheme. e.g. <code>https://mynas.local:8080/health</code></td>
+</tr>
+<tr>
+<td><code>method</code></td>
+<td><code>GET</code></td>
+<td>HTTP method: <code>GET</code>, <code>HEAD</code>, or <code>POST</code></td>
+</tr>
+<tr>
+<td><code>interval_seconds</code></td>
+<td><code>60</code></td>
+<td>How often to run the probe</td>
+</tr>
+<tr>
+<td><code>timeout_seconds</code></td>
+<td><code>10</code></td>
+<td>Request timeout. Probe fails if no response within this time.</td>
+</tr>
+<tr>
+<td><code>retries</code></td>
+<td><code>0</code></td>
+<td>Consecutive failures required before marking <code>down</code></td>
+</tr>
+<tr>
+<td><code>retries_degraded</code></td>
+<td><code>2</code></td>
+<td>Consecutive slow responses (above <code>slow_threshold_ms</code>) required before marking <code>degraded</code></td>
+</tr>
+<tr>
+<td><code>recovery_successes</code></td>
+<td><code>2</code></td>
+<td>Consecutive clean passes needed to recover from <code>down</code></td>
+</tr>
+<tr>
+<td><code>recovery_interval_seconds</code></td>
+<td><em>(same as interval)</em></td>
+<td>Interval to use while the monitor is down/degraded</td>
+</tr>
+<tr>
+<td><code>slow_threshold_ms</code></td>
+<td><em>(disabled)</em></td>
+<td>Mark as <code>degraded</code> if response takes longer than this</td>
+</tr>
+<tr>
+<td><code>expected_status</code></td>
+<td><em>(any 2xx)</em></td>
+<td>Exact HTTP status code required for success</td>
+</tr>
+<tr>
+<td><code>success_http_status_codes</code></td>
+<td><em>(empty)</em></td>
+<td>List of acceptable HTTP status codes. Overrides <code>expected_status</code> if set.</td>
+</tr>
+<tr>
+<td><code>http_body_contains</code></td>
+<td><em>(disabled)</em></td>
+<td>Response body must contain this substring</td>
+</tr>
+<tr>
+<td><code>follow_redirects</code></td>
+<td><code>true</code></td>
+<td>Whether to follow HTTP redirects</td>
+</tr>
+<tr>
+<td><code>max_redirects</code></td>
+<td><code>5</code></td>
+<td>Maximum redirects to follow</td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td><em>(empty)</em></td>
+<td>Map of HTTP headers to include in the request</td>
+</tr>
+<tr>
+<td><code>ignore_tls_errors</code></td>
+<td><code>false</code></td>
+<td>Skip TLS certificate verification. Use only for internal services with self-signed certs.</td>
+</tr>
+<tr>
+<td><code>check_cert_expiry</code></td>
+<td><code>false</code></td>
+<td>Alert when the TLS certificate is close to expiry</td>
+</tr>
+<tr>
+<td><code>cert_expiry_min_days</code></td>
+<td><code>14</code></td>
+<td>Days before expiry to start alerting (requires <code>check_cert_expiry: true</code>)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<p><strong>Basic health check:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Target: https://myapp.local/health
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Method: GET
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Expected status: 200
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Interval: 60s
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Timeout: 10s
+</code></pre></div></p>
+<p><strong>Authenticated API endpoint:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Target: https://myapp.local/api/status
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Method: GET
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Headers:
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  Authorization: Bearer mysecrettoken
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  X-Internal: true
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>Expected status: 200
+</code></pre></div></p>
+<p><strong>Body keyword match — check the app is actually up, not just returning 200 from a load balancer:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Target: https://myapp.local/
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Body contains: &quot;status&quot;:&quot;healthy&quot;
+</code></pre></div></p>
+<p><strong>Self-signed certificate (common for internal services):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Target: https://192.168.1.50:8443/
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Ignore TLS errors: true
+</code></pre></div></p>
+<p><strong>Certificate expiry monitoring:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Target: https://myapp.example.com/
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Check cert expiry: true
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Cert expiry min days: 21
+</code></pre></div>
+This marks the monitor as <code>degraded</code> 21 days before the cert expires, giving you time to renew before it goes <code>down</code>.</p>
+<p><strong>Slow response alerting:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Target: https://myapp.local/
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>Slow threshold: 2000ms
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Retries to degraded: 2
+</code></pre></div>
+After 2 consecutive responses over 2 seconds the monitor enters <code>degraded</code> — even if the status code is correct. A single slow response that clears on the next check stays <code>up</code>.</p>
+<p><strong>Specific status codes — useful for endpoints that return 204 or 401:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Target: https://myapp.local/api/metrics
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>Success status codes: [200, 204]
+</code></pre></div></p>
+<hr />
+<h3 id="tcp-port">TCP port<a class="headerlink" href="#tcp-port" title="Permanent link">&para;</a></h3>
+<p>Attempts to open a TCP connection to a host and port. Succeeds if the connection is accepted; fails if refused or timed out. No application-layer handshake — pure connectivity.</p>
+<h4 id="configuration_1">Configuration<a class="headerlink" href="#configuration_1" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target</code></td>
+<td>required</td>
+<td><code>host:port</code> — e.g. <code>192.168.1.10:5432</code> or <code>mynas.local:22</code></td>
+</tr>
+<tr>
+<td><code>interval_seconds</code></td>
+<td><code>60</code></td>
+<td>How often to probe</td>
+</tr>
+<tr>
+<td><code>timeout_seconds</code></td>
+<td><code>10</code></td>
+<td>Connection timeout</td>
+</tr>
+<tr>
+<td><code>retries</code></td>
+<td><code>0</code></td>
+<td>Consecutive failures required before marking <code>down</code></td>
+</tr>
+<tr>
+<td><code>retries_degraded</code></td>
+<td><code>2</code></td>
+<td>Consecutive slow connections required before marking <code>degraded</code> (requires <code>slow_threshold_ms</code>)</td>
+</tr>
+<tr>
+<td><code>recovery_successes</code></td>
+<td><code>2</code></td>
+<td>Consecutive clean passes needed to recover from <code>down</code></td>
+</tr>
+<tr>
+<td><code>recovery_interval_seconds</code></td>
+<td><em>(same as interval)</em></td>
+<td>Faster interval while down</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a># PostgreSQL on a private server
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>Target: 192.168.1.10:5432
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a># SSH availability
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>Target: mynas.local:22
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a># Minecraft server
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>Target: mc.home.arpa:25565
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a># Home Assistant
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>Target: homeassistant.local:8123
+</code></pre></div>
+<hr />
+<h3 id="icmp-ping">ICMP ping<a class="headerlink" href="#icmp-ping" title="Permanent link">&para;</a></h3>
+<p>Sends ICMP echo requests. The simplest reachability check — useful when no port is guaranteed to be open.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>ICMP ping <strong>requires a Relay</strong>. The Lanby platform runs in cloud environments that block raw ICMP. Additionally, the Relay container needs <code>NET_RAW</code> capability — see <a href="../relays/#icmp-ping-and-docker-capabilities">Relay docs</a>.</p>
+</div>
+<h4 id="configuration_2">Configuration<a class="headerlink" href="#configuration_2" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target</code></td>
+<td>required</td>
+<td>Hostname or IP address. e.g. <code>192.168.1.1</code> or <code>router.local</code></td>
+</tr>
+<tr>
+<td><code>timeout_seconds</code></td>
+<td><code>10</code></td>
+<td>Wait time for ICMP reply</td>
+</tr>
+<tr>
+<td><code>interval_seconds</code></td>
+<td><code>60</code></td>
+<td>How often to ping</td>
+</tr>
+<tr>
+<td><code>retries</code></td>
+<td><code>0</code></td>
+<td>Consecutive failures required before marking <code>down</code></td>
+</tr>
+<tr>
+<td><code>recovery_successes</code></td>
+<td><code>2</code></td>
+<td>Consecutive passes needed to recover from <code>down</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a># Router/gateway reachability
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Target: 192.168.1.1
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a># Network device with no open ports
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>Target: 192.168.1.200
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a># Another machine by hostname
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>Target: myserver.local
+</code></pre></div>
+<hr />
+<h3 id="dns">DNS<a class="headerlink" href="#dns" title="Permanent link">&para;</a></h3>
+<p>Resolves a DNS name and optionally validates the answer. Useful for detecting broken records, split-horizon mismatches, or unexpected changes.</p>
+<h4 id="configuration_3">Configuration<a class="headerlink" href="#configuration_3" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target</code></td>
+<td>required</td>
+<td>Used as <code>dns_host</code> if <code>dns_host</code> is not set</td>
+</tr>
+<tr>
+<td><code>dns_host</code></td>
+<td><em>(target value)</em></td>
+<td>The hostname to resolve</td>
+</tr>
+<tr>
+<td><code>dns_type</code></td>
+<td><code>A</code></td>
+<td>Record type: <code>A</code>, <code>AAAA</code>, <code>CNAME</code>, <code>TXT</code>, <code>NS</code></td>
+</tr>
+<tr>
+<td><code>dns_expect</code></td>
+<td><em>(disabled)</em></td>
+<td>Substring that must appear in at least one answer record</td>
+</tr>
+<tr>
+<td><code>dns_nameserver</code></td>
+<td><em>(system resolver)</em></td>
+<td>Query a specific nameserver instead. e.g. <code>192.168.1.1</code> or <code>8.8.8.8</code></td>
+</tr>
+<tr>
+<td><code>interval_seconds</code></td>
+<td><code>60</code></td>
+<td>How often to query</td>
+</tr>
+<tr>
+<td><code>timeout_seconds</code></td>
+<td><code>5</code></td>
+<td>Query timeout</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
+<p><strong>Check a domain resolves at all:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>DNS host: myapp.local
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Type: A
+</code></pre></div></p>
+<p><strong>Verify a specific IP is returned (e.g. your internal DNS overrides an external record):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>DNS host: myapp.example.com
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Type: A
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>Expect: 192.168.1.50
+</code></pre></div>
+Fails if the answer doesn't contain <code>192.168.1.50</code> — useful to catch split-horizon DNS breaking.</p>
+<p><strong>Check your Pi-hole or AdGuard Home is resolving correctly:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>DNS host: google.com
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Type: A
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Nameserver: 192.168.1.53
+</code></pre></div>
+Queries your local resolver directly, bypassing the system default.</p>
+<p><strong>Monitor a Let's Encrypt TXT record or DKIM selector:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>DNS host: _dmarc.example.com
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>Type: TXT
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>Expect: v=DMARC1
+</code></pre></div></p>
+<p><strong>Check CNAME is pointing at the right place:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>DNS host: www.example.com
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>Type: CNAME
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>Expect: example.com
+</code></pre></div></p>
+<hr />
+<h3 id="grpc-health">gRPC health<a class="headerlink" href="#grpc-health" title="Permanent link">&para;</a></h3>
+<p>Calls the standard <code>grpc.health.v1.Health/Check</code> RPC and expects a <code>SERVING</code> response. Compatible with any service implementing the <a href="https://github.com/grpc/grpc/blob/master/doc/health-checking.md">gRPC Health Checking Protocol</a>.</p>
+<h4 id="configuration_4">Configuration<a class="headerlink" href="#configuration_4" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target</code></td>
+<td>required</td>
+<td><code>host:port</code> — e.g. <code>myservice.local:50051</code></td>
+</tr>
+<tr>
+<td><code>grpc_service</code></td>
+<td><em>(empty — checks overall server health)</em></td>
+<td>Sub-service name to check</td>
+</tr>
+<tr>
+<td><code>grpc_tls</code></td>
+<td><code>false</code></td>
+<td>Use TLS. Set to <code>true</code> for production gRPC services.</td>
+</tr>
+<tr>
+<td><code>interval_seconds</code></td>
+<td><code>60</code></td>
+<td>How often to check</td>
+</tr>
+<tr>
+<td><code>timeout_seconds</code></td>
+<td><code>10</code></td>
+<td>RPC timeout</td>
+</tr>
+<tr>
+<td><code>retries</code></td>
+<td><code>0</code></td>
+<td>Consecutive failures required before marking <code>down</code></td>
+</tr>
+<tr>
+<td><code>retries_degraded</code></td>
+<td><code>2</code></td>
+<td>Consecutive slow RPCs required before marking <code>degraded</code> (requires <code>slow_threshold_ms</code>)</td>
+</tr>
+<tr>
+<td><code>recovery_successes</code></td>
+<td><code>2</code></td>
+<td>Consecutive clean passes needed to recover from <code>down</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples_4">Examples<a class="headerlink" href="#examples_4" title="Permanent link">&para;</a></h4>
+<p><strong>Overall server health:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Target: myservice.local:50051
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>TLS: false
+</code></pre></div></p>
+<p><strong>Specific sub-service (e.g. a gRPC service with multiple handlers):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Target: myservice.local:50051
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Service: myapp.v1.UserService
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>TLS: true
+</code></pre></div></p>
+<hr />
+<h2 id="keepalive-monitors">Keepalive monitors<a class="headerlink" href="#keepalive-monitors" title="Permanent link">&para;</a></h2>
+<p>Keepalive monitors flip the relationship: your service checks in with Lanby after each run. If check-ins stop arriving, Lanby alerts you.</p>
+<p><a href="../keepalive/">Full keepalive documentation →</a></p>
+<hr />
+<h2 id="planned-probe-types">Planned probe types<a class="headerlink" href="#planned-probe-types" title="Permanent link">&para;</a></h2>
+<h3 id="browser-synthetic">Browser / synthetic<a class="headerlink" href="#browser-synthetic" title="Permanent link">&para;</a></h3>
+<p>Drives a real browser to load a page and optionally interact with it — clicking buttons, filling forms, asserting text. Catches JavaScript errors, broken logins, and issues that HTTP probes miss entirely.</p>
+<p><em>Requires a Relay. Powered by Playwright.</em></p>
+<h3 id="smtp-mail-server">SMTP / mail server<a class="headerlink" href="#smtp-mail-server" title="Permanent link">&para;</a></h3>
+<p>Connects to an SMTP server and performs the initial handshake (EHLO). Confirms the mail server is listening and responding — useful for self-hosted mail setups like Mailcow, Maddy, or Postfix.</p>
+<p><em>Ports 25, 465, 587. STARTTLS support planned.</em></p>
+<h3 id="udp">UDP<a class="headerlink" href="#udp" title="Permanent link">&para;</a></h3>
+<p>Sends a UDP packet and optionally checks for a response. Useful for game servers, VPN endpoints (WireGuard, OpenVPN), and other connectionless services.</p>
+<p><em>Requires a Relay.</em></p>
+<h3 id="snmp">SNMP<a class="headerlink" href="#snmp" title="Permanent link">&para;</a></h3>
+<p>Polls an SNMP OID and checks the returned value against a threshold or expected string. Monitor network switches, routers, NAS devices, and UPSes that speak SNMP but don't expose an HTTP API.</p>
+<p><em>SNMPv1, v2c, v3. Requires a Relay.</em></p>
+<h3 id="push-webhook-receiver">Push / webhook receiver<a class="headerlink" href="#push-webhook-receiver" title="Permanent link">&para;</a></h3>
+<p>Receives an inbound webhook payload from an external service (Grafana alerts, GitHub Actions, Uptime Kuma) and converts it into a Lanby notification.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Have a monitor type you need that isn't listed? Reach out — we build based on what self-hosters actually run.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

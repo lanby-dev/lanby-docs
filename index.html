@@ -1,0 +1,1048 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Guides and reference for Lanby — monitoring, relays, alerts, and the notification API.">
+      
+      
+      
+        <link rel="canonical" href="https://docs.lanby.dev/">
+      
+      
+      
+        <link rel="next" href="relays/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Lanby Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#lanby-docs" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="Lanby Docs" class="md-header__button md-logo" aria-label="Lanby Docs" data-md-component="logo">
+      
+  <img src="assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Lanby Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Home
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://console.lanby.dev" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Open Console
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="Lanby Docs" class="md-nav__button md-logo" aria-label="Lanby Docs" data-md-component="logo">
+      
+  <img src="assets/logo.png" alt="logo">
+
+    </a>
+    Lanby Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://console.lanby.dev" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Open Console
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-pieces-fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the pieces fit
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How the pieces fit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#managed-probe-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Managed probe monitor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keepalive-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keepalive monitor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relay-probe-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relay probe monitor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#start-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start here
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#all-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="All documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alerts-delivery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alerts &amp; Delivery
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="relays/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relay agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Monitoring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monitors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="keepalive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keepalive heartbeats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Alerts & Delivery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Alerts & Delivery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="destinations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Destinations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="notifications/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Publish API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-pieces-fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the pieces fit
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How the pieces fit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#managed-probe-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Managed probe monitor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keepalive-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keepalive monitor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relay-probe-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relay probe monitor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#start-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start here
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#all-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="All documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alerts-delivery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alerts &amp; Delivery
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="lanby-docs">Lanby Docs<a class="headerlink" href="#lanby-docs" title="Permanent link">&para;</a></h1>
+<p>A <strong>LANBY</strong> — <em>Large Automatic Navigation BuoY</em> — is a floating navigational aid designed to replace crewed lightships. It sits offshore, watches over shipping lanes, and runs without intervention.</p>
+<p>That's what Lanby the product is: infrastructure that watches your services quietly and reliably, from the outside, so you don't have to.</p>
+<hr />
+<p>Lanby watches your services from the outside and pings you when something's wrong. It runs on infrastructure that's completely separate from what you're monitoring, so an outage can't take the watchman down with it.</p>
+<p>These docs cover the two jobs Lanby does:</p>
+<ol>
+<li><strong>Uptime monitoring</strong> — probes that actively check services (HTTP, TCP, DNS, ping, gRPC) on a schedule, and keepalive heartbeats where your jobs check in with Lanby after each run.</li>
+<li><strong>Notification delivery</strong> — a simple publish API and a set of destinations (webhooks, Telegram, more on the way) that route events to the people and systems that should know.</li>
+</ol>
+<hr />
+<h2 id="how-the-pieces-fit">How the pieces fit<a class="headerlink" href="#how-the-pieces-fit" title="Permanent link">&para;</a></h2>
+<p>Three patterns cover most setups. Color key used across all diagrams:
+<strong>Blue</strong> = Lanby API &nbsp;·&nbsp; <strong>Teal</strong> = Relay &nbsp;·&nbsp; <strong>Orange</strong> = your service or job &nbsp;·&nbsp; <strong>Purple</strong> = alert destination</p>
+<hr />
+<h3 id="managed-probe-monitor">Managed probe monitor<a class="headerlink" href="#managed-probe-monitor" title="Permanent link">&para;</a></h3>
+<p>Lanby probes a publicly reachable service on a schedule. No agent required.</p>
+<pre class="mermaid"><code>%%{init:{'theme':'base','themeVariables':{'primaryColor':'#3a52a8','primaryBorderColor':'#7090ee','primaryTextColor':'#fff','edgeLabelBackground':'#1a1a2e','lineColor':'#7090ee'}}}%%
+flowchart LR
+    classDef lanby  fill:#3a52a8,stroke:#7090ee,stroke-width:2px,color:#fff
+    classDef svc    fill:#a05a20,stroke:#e08840,stroke-width:2px,color:#fff
+    classDef dest   fill:#5c3480,stroke:#9d5cce,stroke-width:2px,color:#fff
+
+    L["Lanby API\n(probe engine)"]:::lanby
+    S["Your service\nhttps://myapp.com"]:::svc
+    D["Destination\nTelegram · Webhook"]:::dest
+
+    L == "HTTP · TCP · DNS\nevery N seconds" ==&gt; S
+    S -. "pass / fail + latency" .-&gt; L
+    L -- "alert on\nfailure or recovery" --&gt; D
+
+    linkStyle 0 stroke:#7090ee,stroke-width:3px,color:#fff
+    linkStyle 1 stroke:#7090ee,stroke-width:2px,stroke-dasharray:6
+    linkStyle 2 stroke:#9d5cce,stroke-width:2px</code></pre>
+<hr />
+<h3 id="keepalive-monitor">Keepalive monitor<a class="headerlink" href="#keepalive-monitor" title="Permanent link">&para;</a></h3>
+<p>Your job calls Lanby after each successful run. Lanby alerts if check-ins stop arriving.</p>
+<pre class="mermaid"><code>%%{init:{'theme':'base','themeVariables':{'primaryColor':'#3a52a8','primaryBorderColor':'#7090ee','primaryTextColor':'#fff','edgeLabelBackground':'#1a1a2e','lineColor':'#7090ee'}}}%%
+flowchart LR
+    classDef lanby  fill:#3a52a8,stroke:#7090ee,stroke-width:2px,color:#fff
+    classDef job    fill:#a05a20,stroke:#e08840,stroke-width:2px,color:#fff
+    classDef dest   fill:#5c3480,stroke:#9d5cce,stroke-width:2px,color:#fff
+
+    J["Your cron job\nor script"]:::job
+    L["Lanby API\nexpects a beat every N\nsilence = alert fires"]:::lanby
+    D["Destination\nTelegram · Webhook"]:::dest
+
+    J == "POST /beat/id\nafter each successful run" ==&gt; L
+    L -- "alert" --&gt; D
+
+    linkStyle 0 stroke:#e08840,stroke-width:3px
+    linkStyle 1 stroke:#9d5cce,stroke-width:2px</code></pre>
+<hr />
+<h3 id="relay-probe-monitor">Relay probe monitor<a class="headerlink" href="#relay-probe-monitor" title="Permanent link">&para;</a></h3>
+<p>A Relay runs inside your private network. It polls Lanby for probe assignments, runs the checks locally, and ships results back — no inbound firewall ports required.</p>
+<pre class="mermaid"><code>%%{init:{'theme':'base','themeVariables':{'primaryColor':'#3a52a8','primaryBorderColor':'#7090ee','primaryTextColor':'#fff','edgeLabelBackground':'#1a1a2e','lineColor':'#7090ee'}}}%%
+flowchart LR
+    classDef lanby  fill:#3a52a8,stroke:#7090ee,stroke-width:2px,color:#fff
+    classDef relay  fill:#1e6e5e,stroke:#40c0a8,stroke-width:2px,color:#fff
+    classDef svc    fill:#a05a20,stroke:#e08840,stroke-width:2px,color:#fff
+    classDef dest   fill:#5c3480,stroke:#9d5cce,stroke-width:2px,color:#fff
+
+    subgraph cloud["Lanby cloud"]
+        L["Lanby API"]:::lanby
+        D["Destination\nTelegram · Webhook"]:::dest
+    end
+    subgraph net["Your private network"]
+        R["Relay"]:::relay
+        S["Internal service\n192.168.x.x · myhost.local"]:::svc
+    end
+
+    L -- "probe config\n(relay polls)" --&gt; R
+    R == "HTTP · TCP · ICMP\nprobe locally" ==&gt; S
+    R -- "results via\nPOST /sync" --&gt; L
+    L -- "alert on\nfailure or recovery" --&gt; D
+
+    linkStyle 0 stroke:#40c0a8,stroke-width:2px,stroke-dasharray:4
+    linkStyle 1 stroke:#e08840,stroke-width:3px
+    linkStyle 2 stroke:#40c0a8,stroke-width:2px
+    linkStyle 3 stroke:#9d5cce,stroke-width:2px</code></pre>
+<hr />
+<h2 id="start-here">Start here<a class="headerlink" href="#start-here" title="Permanent link">&para;</a></h2>
+<p>New to Lanby? These pages in order cover 80% of what you'll actually configure:</p>
+<ol>
+<li><a href="monitors/"><strong>Monitor types</strong></a> — pick the right probe or keepalive for what you're watching.</li>
+<li><a href="destinations/"><strong>Destinations</strong></a> — set up where alerts go.</li>
+<li><a href="relays/"><strong>Relay</strong></a> — deploy one if you want to monitor private network services.</li>
+<li><a href="keepalive/"><strong>Keepalive heartbeats</strong></a> — wire up cron jobs, backups, and scheduled tasks.</li>
+<li><a href="notifications/"><strong>Publish API</strong></a> — send arbitrary events from any script to your existing destinations.</li>
+</ol>
+<hr />
+<h2 id="all-documentation">All documentation<a class="headerlink" href="#all-documentation" title="Permanent link">&para;</a></h2>
+<h3 id="concepts">Concepts<a class="headerlink" href="#concepts" title="Permanent link">&para;</a></h3>
+<p><a href="relays/"><strong>Relay</strong></a>
+: How Relay works, the security model, deployment, and claiming — for monitoring private network services without opening inbound firewall ports.</p>
+<h3 id="monitoring">Monitoring<a class="headerlink" href="#monitoring" title="Permanent link">&para;</a></h3>
+<p><a href="monitors/"><strong>Monitor types</strong></a>
+: Every monitor type — active probes (HTTP, TCP, ping, DNS, gRPC) and keepalive heartbeats — including what's live and what's on the roadmap.</p>
+<p><a href="keepalive/"><strong>Keepalive heartbeats</strong></a>
+: Monitor cron jobs, backup scripts, and scheduled tasks by having them check in with Lanby after each successful run.</p>
+<h3 id="alerts-delivery">Alerts &amp; Delivery<a class="headerlink" href="#alerts-delivery" title="Permanent link">&para;</a></h3>
+<p><a href="destinations/"><strong>Destinations</strong></a>
+: Configure where Lanby sends alerts — webhooks, Telegram, topic routing, and the dead-letter queue.</p>
+<p><a href="notifications/"><strong>Publish API</strong></a>
+: Publish events to Lanby from any script, app, or cron job with a single HTTP call.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.sections", "navigation.top", "navigation.expand", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

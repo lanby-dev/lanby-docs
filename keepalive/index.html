@@ -1,0 +1,1718 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Guides and reference for Lanby — monitoring, relays, alerts, and the notification API.">
+      
+      
+      
+        <link rel="canonical" href="https://docs.lanby.dev/keepalive/">
+      
+      
+        <link rel="prev" href="../monitors/">
+      
+      
+        <link rel="next" href="../destinations/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Keepalive heartbeats - Lanby Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#keepalive-heartbeats" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Lanby Docs" class="md-header__button md-logo" aria-label="Lanby Docs" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Lanby Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Keepalive heartbeats
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://console.lanby.dev" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Open Console
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Lanby Docs" class="md-nav__button md-logo" aria-label="Lanby Docs" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    Lanby Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://console.lanby.dev" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Open Console
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../relays/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relay agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Monitoring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../monitors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keepalive heartbeats
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keepalive heartbeats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The endpoint
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sending-a-heartbeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sending a heartbeat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sending a heartbeat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#curl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        curl
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wget" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        wget
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shell-cron-success-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shell / cron — success only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#systemd-timer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        systemd timer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Go
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docker-healthcheck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docker healthcheck
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ansible" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ansible
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sonarr-radarr-arr-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sonarr / Radarr / *arr apps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reporting-job-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reporting job status
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reporting job status">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#accepted-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accepted values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-use-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to use it
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#maintenance-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maintenance windows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pausing-a-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pausing a monitor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schedule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grace-window" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grace window
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Grace window">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#choosing-grace-after" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing grace-after
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#early-beats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Early beats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#anchor-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anchor time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#re-alert-on-sustained-outage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Re-alert on sustained outage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Alerts & Delivery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Alerts & Delivery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../destinations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Destinations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notifications/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Publish API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The endpoint
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sending-a-heartbeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sending a heartbeat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sending a heartbeat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#curl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        curl
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wget" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        wget
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shell-cron-success-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shell / cron — success only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#systemd-timer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        systemd timer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Go
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docker-healthcheck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docker healthcheck
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ansible" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ansible
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sonarr-radarr-arr-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sonarr / Radarr / *arr apps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reporting-job-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reporting job status
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reporting job status">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#accepted-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accepted values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-use-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to use it
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#maintenance-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maintenance windows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pausing-a-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pausing a monitor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schedule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grace-window" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grace window
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Grace window">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#choosing-grace-after" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing grace-after
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#early-beats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Early beats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#anchor-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anchor time
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#re-alert-on-sustained-outage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Re-alert on sustained outage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="keepalive-heartbeats">Keepalive heartbeats<a class="headerlink" href="#keepalive-heartbeats" title="Permanent link">&para;</a></h1>
+<p>Some things can't be probed from the outside — cron jobs, backup scripts, data pipelines, batch processors. Keepalive monitors flip the relationship: your job checks in with Lanby after each successful run, and Lanby alerts you if it stops hearing back.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>Each keepalive monitor gets a unique endpoint URL. After a successful run, your job sends a <code>POST</code> to that URL. Lanby records the timestamp. If the next check-in doesn't arrive within the configured interval plus a grace period, the monitor goes down and an alert fires.</p>
+<p>There's no agent to install and no port to open. Anything that can make an HTTP request can send a heartbeat.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Keepalive monitors detect <em>missed</em> runs, not bad output. If your backup job completes but produces corrupt data, that's a separate concern. Use them alongside output validation in your scripts, not instead of it.</p>
+</div>
+<h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h2>
+<ol>
+<li>In the console, go to <strong>Monitors</strong> and create a new monitor.</li>
+<li>Choose <strong>Keepalive heartbeat</strong> as the monitor type.</li>
+<li>Set the expected interval and grace period.</li>
+<li>Save. The console shows the unique heartbeat URL and your API key.</li>
+<li>Add the heartbeat call to the end of your job.</li>
+</ol>
+<p>The monitor starts in a <strong>pending</strong> state until the first heartbeat arrives. No alerts fire during this initial window.</p>
+<h2 id="the-endpoint">The endpoint<a class="headerlink" href="#the-endpoint" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>POST https://in.lanby.dev/beat/&lt;monitor-id&gt;
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Authorization: Bearer &lt;your-api-key&gt;
+</code></pre></div>
+<p>By default, only the arrival time matters. A <code>200 OK</code> response confirms receipt.</p>
+<p>The request body is optional. When provided, it can carry a self-reported status — see <a href="#reporting-job-status">Reporting job status</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Store your API key in an environment variable (<code>LANBY_API_KEY</code>) rather than hardcoding it in scripts. The examples below use this pattern.</p>
+</div>
+<h2 id="sending-a-heartbeat">Sending a heartbeat<a class="headerlink" href="#sending-a-heartbeat" title="Permanent link">&para;</a></h2>
+<h3 id="curl">curl<a class="headerlink" href="#curl" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://in.lanby.dev/beat/&lt;monitor-id&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">LANBY_API_KEY</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>--max-time<span class="w"> </span><span class="m">5</span>
+</code></pre></div>
+<h3 id="wget">wget<a class="headerlink" href="#wget" title="Permanent link">&para;</a></h3>
+<p>Useful on minimal systems where curl isn't available:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>wget<span class="w"> </span>-q<span class="w"> </span>-O<span class="w"> </span>/dev/null<span class="w"> </span>--post-data<span class="o">=</span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>--header<span class="o">=</span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">LANBY_API_KEY</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>--timeout<span class="o">=</span><span class="m">5</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span>https://in.lanby.dev/beat/&lt;monitor-id&gt;
+</code></pre></div>
+<h3 id="shell-cron-success-only">Shell / cron — success only<a class="headerlink" href="#shell-cron-success-only" title="Permanent link">&para;</a></h3>
+<p>The <code>&amp;&amp;</code> ensures the heartbeat only fires if the job exits successfully:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># /etc/cron.d/backup</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="m">0</span><span class="w"> </span><span class="m">3</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>root<span class="w"> </span>/opt/scripts/backup.sh<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://in.lanby.dev/beat/&lt;monitor-id&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">LANBY_API_KEY</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span>--max-time<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+</code></pre></div>
+<p>The <code>|| true</code> at the end prevents a Lanby outage from making cron report the job as failed.</p>
+<h3 id="systemd-timer">systemd timer<a class="headerlink" href="#systemd-timer" title="Permanent link">&para;</a></h3>
+<p>For systemd timers, use <code>ExecStartPost</code> — it only runs if <code>ExecStart</code> exits zero:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># /etc/systemd/system/backup.service</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">[Unit]</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="na">Description</span><span class="o">=</span><span class="s">Nightly backup</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">[Service]</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="na">Type</span><span class="o">=</span><span class="s">oneshot</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="na">EnvironmentFile</span><span class="o">=</span><span class="s">/etc/lanby.env</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="na">ExecStart</span><span class="o">=</span><span class="s">/opt/scripts/backup.sh</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="na">ExecStartPost</span><span class="o">=</span><span class="s">curl -s -X POST https://in.lanby.dev/beat/&lt;monitor-id&gt; </span>\
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="s">-H &quot;Authorization: Bearer ${LANBY_API_KEY}&quot; </span>\
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="s">--max-time 5</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># /etc/lanby.env</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nv">LANBY_API_KEY</span><span class="o">=</span>lnby_live_...
+</code></pre></div>
+<h3 id="python">Python<a class="headerlink" href="#python" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">API_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;LANBY_API_KEY&quot;</span><span class="p">]</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">MONITOR_ID</span> <span class="o">=</span> <span class="s2">&quot;&lt;monitor-id&gt;&quot;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_backup</span><span class="p">():</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="c1"># ... your job logic ...</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="k">pass</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">run_backup</span><span class="p">()</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="c1"># Notify Lanby — don&#39;t let a Lanby outage fail the job</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>        <span class="sa">f</span><span class="s2">&quot;https://in.lanby.dev/beat/</span><span class="si">{</span><span class="n">MONITOR_ID</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">API_KEY</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>        <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>    <span class="p">)</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>    <span class="k">pass</span>
+</code></pre></div>
+<h3 id="go">Go<a class="headerlink" href="#go" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">package</span><span class="w"> </span><span class="nx">main</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="s">&quot;fmt&quot;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="s">&quot;net/http&quot;</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="s">&quot;os&quot;</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="s">&quot;time&quot;</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">)</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="kd">func</span><span class="w"> </span><span class="nx">ping</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="nx">monitorID</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&quot;&lt;monitor-id&gt;&quot;</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="nx">apiKey</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">os</span><span class="p">.</span><span class="nx">Getenv</span><span class="p">(</span><span class="s">&quot;LANBY_API_KEY&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">    </span><span class="nx">client</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Client</span><span class="p">{</span><span class="nx">Timeout</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">}</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">    </span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">NewRequest</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">MethodPost</span><span class="p">,</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">        </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;https://in.lanby.dev/beat/%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">monitorID</span><span class="p">),</span><span class="w"> </span><span class="kc">nil</span><span class="p">)</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">    </span><span class="nx">req</span><span class="p">.</span><span class="nx">Header</span><span class="p">.</span><span class="nx">Set</span><span class="p">(</span><span class="s">&quot;Authorization&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Bearer &quot;</span><span class="o">+</span><span class="nx">apiKey</span><span class="p">)</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">    </span><span class="nx">resp</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">Do</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="w">        </span><span class="nx">resp</span><span class="p">.</span><span class="nx">Body</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="p">}</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="w">    </span><span class="nx">runBackup</span><span class="p">()</span>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="w">    </span><span class="nx">ping</span><span class="p">()</span><span class="w"> </span><span class="c1">// best-effort, don&#39;t check error</span>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="nodejs">Node.js<a class="headerlink" href="#nodejs" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">MONITOR_ID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&lt;monitor-id&gt;&#39;</span><span class="p">;</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">API_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">LANBY_API_KEY</span><span class="p">;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">ping</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="sb">`https://in.lanby.dev/beat/</span><span class="si">${</span><span class="nx">MONITOR_ID</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">      </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">      </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Authorization</span><span class="o">:</span><span class="w"> </span><span class="sb">`Bearer </span><span class="si">${</span><span class="nx">API_KEY</span><span class="si">}</span><span class="sb">`</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">      </span><span class="nx">signal</span><span class="o">:</span><span class="w"> </span><span class="nx">AbortSignal</span><span class="p">.</span><span class="nx">timeout</span><span class="p">(</span><span class="mf">5000</span><span class="p">),</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">    </span><span class="p">});</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="c1">// best-effort</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="p">}</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="k">await</span><span class="w"> </span><span class="nx">runBackup</span><span class="p">();</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="k">await</span><span class="w"> </span><span class="nx">ping</span><span class="p">();</span>
+</code></pre></div>
+<h3 id="docker-healthcheck">Docker healthcheck<a class="headerlink" href="#docker-healthcheck" title="Permanent link">&para;</a></h3>
+<p>Use keepalives to verify a long-running container is functioning, not just running. Add the ping to your container's internal health logic:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">HEALTHCHECK</span><span class="w"> </span>--interval<span class="o">=</span>5m<span class="w"> </span>--timeout<span class="o">=</span>10s<span class="w"> </span>--start-period<span class="o">=</span>30s<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>CMD<span class="w"> </span>curl<span class="w"> </span>-sf<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://in.lanby.dev/beat/&lt;monitor-id&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">LANBY_API_KEY</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+<p>Or ping from a sidecar script in the container at the end of each work cycle.</p>
+<h3 id="ansible">Ansible<a class="headerlink" href="#ansible" title="Permanent link">&para;</a></h3>
+<p>At the end of a playbook that should complete on schedule:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Notify Lanby on success</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">uri</span><span class="p">:</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://in.lanby.dev/beat/{{</span><span class="nv"> </span><span class="s">monitor_id</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">POST</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="nt">headers</span><span class="p">:</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">      </span><span class="nt">Authorization</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Bearer</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">lanby_api_key</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="nt">status_code</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">  </span><span class="nt">ignore_errors</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">  </span><span class="c1"># don&#39;t fail the playbook if Lanby is unreachable</span>
+</code></pre></div>
+<h3 id="sonarr-radarr-arr-apps">Sonarr / Radarr / *arr apps<a class="headerlink" href="#sonarr-radarr-arr-apps" title="Permanent link">&para;</a></h3>
+<p>The *arr apps support custom scripts on events. Create a script that pings Lanby after a successful import or health check:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="c1"># Called by Sonarr on &quot;On Import&quot; event</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://in.lanby.dev/beat/&lt;monitor-id&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">LANBY_API_KEY</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span>--max-time<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+</code></pre></div>
+<p>Set the interval in Lanby to match how often you expect new content to import (e.g. <code>24h</code> with a 2-hour grace period).</p>
+<hr />
+<h2 id="reporting-job-status">Reporting job status<a class="headerlink" href="#reporting-job-status" title="Permanent link">&para;</a></h2>
+<p>The heartbeat body is optional. Send a small JSON payload to tell Lanby the job ran but didn't fully succeed — useful for jobs that should page you even when they <em>completed</em>, just not cleanly.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://in.lanby.dev/beat/&lt;monitor-id&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">LANBY_API_KEY</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;status&quot;: &quot;degraded&quot;, &quot;message&quot;: &quot;2 of 47 files skipped&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span>--max-time<span class="w"> </span><span class="m">5</span>
+</code></pre></div>
+<h3 id="accepted-values">Accepted values<a class="headerlink" href="#accepted-values" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th><code>status</code></th>
+<th>Resulting state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>(absent)</em> or <code>"ok"</code> or <code>0</code></td>
+<td><code>up</code></td>
+</tr>
+<tr>
+<td><code>"degraded"</code> or <code>1</code></td>
+<td><code>degraded</code></td>
+</tr>
+<tr>
+<td><code>"failed"</code>, <code>"fail"</code>, <code>"error"</code>, <code>"down"</code>, or <code>2</code></td>
+<td><code>down</code></td>
+</tr>
+</tbody>
+</table>
+<p>The optional <code>message</code> field is surfaced in the console and passed through to destination templates as <code>{{message}}</code>.</p>
+<h3 id="when-to-use-it">When to use it<a class="headerlink" href="#when-to-use-it" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Partial success.</strong> A backup that completed but skipped files. A sync that ran but missed some records.</li>
+<li><strong>Soft failure.</strong> A build that succeeded but a downstream step timed out. Your job still considers itself "done" but wants a warning.</li>
+<li><strong>Self-reported errors.</strong> The job caught its own exception, ran the cleanup, and wants to page you without failing the process.</li>
+</ul>
+<p>If your script exits non-zero, you generally don't want to send a heartbeat at all — Lanby will detect the missed window and alert. Status payloads are for the case where the process completed but the outcome wasn't clean.</p>
+<hr />
+<h2 id="maintenance-windows">Maintenance windows<a class="headerlink" href="#maintenance-windows" title="Permanent link">&para;</a></h2>
+<p>A maintenance window suppresses alerts and stops the monitor from timing out during planned outages — nightly reboots, scheduled downtime, OS patching. Configure them per-monitor under <strong>Maintenance</strong> on the monitor's settings page.</p>
+<p>Two types are supported:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Recurring</strong></td>
+<td><code>0 2 * * 0</code> with duration <code>2h</code> — every Sunday at 02:00 local for two hours</td>
+</tr>
+<tr>
+<td><strong>One-off</strong></td>
+<td>From <code>2026-05-12 22:00</code> to <code>2026-05-13 02:00</code></td>
+</tr>
+</tbody>
+</table>
+<p>Both types accept an optional reason (e.g. "Weekly reboot") that's shown in the UI and included in timeline entries.</p>
+<p>During a maintenance window:</p>
+<ul>
+<li>Missed beats do not trigger alerts.</li>
+<li>The monitor does not transition to <code>down</code>.</li>
+<li>The next expected beat time is pushed forward so the window ends cleanly.</li>
+<li>Beats that <em>do</em> arrive are still recorded, so you retain visibility.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Maintenance windows only apply to keepalive monitors. To suspend a probe monitor, use pause.</p>
+</div>
+<hr />
+<h2 id="pausing-a-monitor">Pausing a monitor<a class="headerlink" href="#pausing-a-monitor" title="Permanent link">&para;</a></h2>
+<p>For ad-hoc suspension — debugging, decommissioning, a one-off change — use <strong>Pause</strong> instead of a maintenance window. Two forms:</p>
+<ul>
+<li><strong>Indefinite pause</strong> — monitor stays paused until manually resumed.</li>
+<li><strong>Pause until</strong> — monitor auto-resumes at a specific time.</li>
+</ul>
+<p>While paused, the monitor does not time out, fire alerts, or change state. You can record a reason that's shown in the UI.</p>
+<p>Resuming a monitor re-opens the next expected window <em>from the current time</em> — previous missed windows are not backfilled.</p>
+<hr />
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<h3 id="schedule">Schedule<a class="headerlink" href="#schedule" title="Permanent link">&para;</a></h3>
+<p>A keepalive monitor has to know <em>when to expect the next beat</em>. Three scheduling modes are available:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Interval</strong></td>
+<td>Jobs that run every N seconds/minutes/hours with no fixed wall-clock time. Picks up from the last beat.</td>
+</tr>
+<tr>
+<td><strong>Simple</strong></td>
+<td>Jobs that run on a daily, weekly, or monthly cadence at a specific time-of-day (e.g. "3:30 AM daily").</td>
+</tr>
+<tr>
+<td><strong>Cron</strong></td>
+<td>Jobs driven by a standard 5-field cron expression (e.g. <code>0 */6 * * *</code>) — matches your crontab exactly.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Interval mode:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Schedule: Interval
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>Every: 1 hour
+</code></pre></div></p>
+<p><strong>Simple mode:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Schedule: Simple
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>Frequency: Daily
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>Time of day: 03:30
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>Timezone: America/Los_Angeles
+</code></pre></div></p>
+<p><strong>Cron mode:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Schedule: Cron
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Expression: 0 3 * * *
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>Timezone: America/Los_Angeles
+</code></pre></div></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Set the timezone on wall-clock schedules so daylight-saving transitions don't cause a false alert. Interval-mode schedules are timezone-independent.</p>
+</div>
+<h3 id="grace-window">Grace window<a class="headerlink" href="#grace-window" title="Permanent link">&para;</a></h3>
+<p>Grace absorbs normal runtime variance so a slightly-late or slightly-early beat doesn't flap the monitor. The window is two-sided:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Grace before</strong></td>
+<td>How early a beat may arrive before the expected time and still count as on-schedule.</td>
+</tr>
+<tr>
+<td><strong>Grace after</strong></td>
+<td>How late a beat may arrive after the expected time before the monitor transitions to <code>down</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>The monitor stays <code>up</code> as long as each beat arrives within the window. If <strong>grace after</strong> elapses with no beat, the monitor transitions to <code>down</code> and an alert fires. Recovery is immediate on the next beat.</p>
+<h4 id="choosing-grace-after">Choosing grace-after<a class="headerlink" href="#choosing-grace-after" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Job frequency</th>
+<th>Suggested grace-after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Every minute</td>
+<td>2–5 minutes</td>
+</tr>
+<tr>
+<td>Hourly</td>
+<td>10–15 minutes</td>
+</tr>
+<tr>
+<td>Daily</td>
+<td>30–60 minutes</td>
+</tr>
+<tr>
+<td>Weekly</td>
+<td>4–12 hours</td>
+</tr>
+</tbody>
+</table>
+<p>Set it high enough to survive occasional slow runs, but low enough that you'd still want to know if the job is stuck.</p>
+<h3 id="early-beats">Early beats<a class="headerlink" href="#early-beats" title="Permanent link">&para;</a></h3>
+<p>What happens when a beat arrives <em>before</em> the grace-before window opens?</p>
+<table>
+<thead>
+<tr>
+<th>Behavior</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>record</code> (default)</td>
+<td>Beat is saved to history; timer is not reset; state is unchanged.</td>
+</tr>
+<tr>
+<td><code>ignore</code></td>
+<td>Beat is discarded entirely; no history entry; no state change.</td>
+</tr>
+<tr>
+<td><code>degraded</code></td>
+<td>Beat is saved; monitor is marked <code>degraded</code> (a job that's running too often may indicate a stuck loop).</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>degraded</code> option is useful when you explicitly want to catch unintended double-runs — e.g. a cron job that's been manually triggered on top of its normal schedule.</p>
+<h3 id="anchor-time">Anchor time<a class="headerlink" href="#anchor-time" title="Permanent link">&para;</a></h3>
+<p>By default, a new keepalive monitor stays in <code>pending</code> until the first beat arrives. No alerts fire during this initial window. If you'd rather have the first window open at a specific wall-clock time — e.g. you know the next cron run is at 03:00 tomorrow — set an <strong>anchor time</strong>. The monitor will time out at <code>anchor + interval + grace-after</code> if no beat arrives before then.</p>
+<h3 id="re-alert-on-sustained-outage">Re-alert on sustained outage<a class="headerlink" href="#re-alert-on-sustained-outage" title="Permanent link">&para;</a></h3>
+<p>When a keepalive goes <code>down</code>, a single alert fires on the transition. If the job stays broken for days, that one alert is easy to miss. Set <strong>Re-alert after missed</strong> to fire a repeat alert every N consecutive missed windows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Re-alert after: 3 missed windows
+</code></pre></div>
+<p>With a daily schedule and re-alert-after = 3, you get an alert on day 1 (when it first went down), then again on day 4, day 7, and so on — until the job recovers.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
